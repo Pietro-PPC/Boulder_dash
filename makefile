@@ -1,7 +1,8 @@
-ALLEGRO = `pkg-config allegro-5 allegro_font-5 --libs --cflags`
+CFLAGS = -Wall -std=c99
+PKG_CONFIG=`pkg-config allegro-5 allegro_font-5 --libs --cflags`
 
-all: hello.c  
-	gcc hello.c -o hello $(ALLEGRO)
+all: main.c
+	gcc main.c -o boulder_dash $(PKG_CONFIG) $(CFLAGS)
 
 purge:
-	rm -f hello
+	rm -f boulder_dash
