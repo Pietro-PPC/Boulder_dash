@@ -2,12 +2,15 @@
 #include <allegro5/allegro_font.h>
 #include <stdio.h>
 #include "states.h"
+#include "map.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
 ALLEGRO_FONT* font;
 ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_EVENT event;
+
+map_t map;
 
 bool redraw = true;
 bool done = false;
@@ -54,15 +57,17 @@ void state_initialize()
     // inicializa variáveis de controle
     al_start_timer(timer);
 
-    
+    read_map(&map);
 }
 
 void state_play()
 {
+    // loop principal
     while(true)
     {
         al_wait_for_event(queue, &event);
-
+        
+        // age conforme evento ocorrido
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
@@ -94,5 +99,8 @@ void state_end()
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
+
+    destroy_map(&map);
+
     exit(0);
 }
