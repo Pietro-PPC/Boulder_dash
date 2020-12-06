@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include "sprites.h"
@@ -36,15 +37,14 @@ void init_background(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 
     for (int i = 0; i < map->height; ++i)
         for (int j = 0; j < map->width; ++j)
-            al_draw_bitmap(sprites->blank, i*TILE_S, j*TILE_S, 0);
-
+        {
+            al_draw_bitmap(sprites->blank, j*TILE_S, i*TILE_S, 0);
+        }
     al_set_target_backbuffer(disp);
 }
 
 void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 {
-    //init_background(sprites, map, disp);
-
     sprites->sheet[0] = al_load_bitmap("sprites/tileset.png");
     test_init(sprites->sheet[0], "tileset de sprites");
 
@@ -59,6 +59,8 @@ void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
     sprites->player = get_sprite(sprites->sheet[0], 24, 144, TILE_S, TILE_S);
     
     sprites->blank = get_sprite(sprites->sheet[1], 0, 0, TILE_S, TILE_S);
+    
+    init_background(sprites, map, disp);
 }
 
 void destroy_sprites(sprites_t *sprites)

@@ -22,7 +22,7 @@ void post_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_DISPLAY *disp)
 
 void draw_map(sprites_t *sprites, map_t *map)
 {
-//    al_draw_bitmap(sprites->background, 0, 0, 0);
+    al_draw_bitmap(sprites->background, 0, 0, 0);
 
     int x, y;
     for (int i = 0; i < map->height; ++i)

@@ -9,6 +9,8 @@
 #define DIAMOND 'D'
 #define PLAYER  '@'
 
+#define LEVELFILE "level_1.txt"
+
 typedef struct map_s{
     int width;   // largura do mapa
     int height;  // altura do mapa

@@ -113,6 +113,8 @@ void state_end()
     destroy_sprites(&sprites);
 
     destroy_map(&map);
+    
+    al_shutdown_image_addon();
 
     exit(0);
 }

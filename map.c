@@ -35,8 +35,10 @@ void allocate_map(map_t *map)
 void read_map(map_t *map)
 {
     FILE *f;
+    char filename[101] = "levelmaps/";
+    strcat(filename, LEVELFILE);
 
-    f = fopen("levelmaps/level_1.txt", "r");
+    f = fopen(filename, "r");
     if (!f)
         fatal_error("Falha ao abrir mapa");
 
