@@ -1,3 +1,5 @@
+#include "sprites.h"
+
 #ifndef __MAP__
 #define __MAP__
 
@@ -14,6 +16,7 @@ void read_map(map_t *map);
 
 void destroy_map(map_t *map);
 
+void draw_map(sprites_t *sprites, map_t *map);
 //void print_map(map_t *map);
 
 #endif

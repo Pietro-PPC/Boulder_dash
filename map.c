@@ -3,19 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "error_msg.h"
 #include "map.h"
+#include "sprites.h"
 
 void initialize_map(map_t *map)
 {
     map->width = 0;
     map->height = 0;
     map->m = NULL;
-}
-
-void fatal_error(char *message)
-{
-    fprintf(stderr, "%s\n", message);
-    exit(1);
 }
 
 void allocate_map(map_t *map)
@@ -34,16 +30,6 @@ void allocate_map(map_t *map)
 
     for (int i = 1; i < map->height; ++i)
         map->m[i] = map->m[0] + i * map->width;
-}
-
-void print_map(map_t *map)
-{
-    for (int i = 0; i < map->width * map->height; ++i)
-    {
-        printf("%c", map->m[0][i]);
-        if (!((i+1) % map->width))
-            printf("\n");
-    }
 }
 
 void read_map(map_t *map)

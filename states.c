@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include "states.h"
 #include "map.h"
+#include "error_msg.h"
+#include "sprites.h"
+#include "draw.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
@@ -11,19 +14,10 @@ ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_EVENT event;
 
 map_t map;
+sprites_t sprites;
 
 bool redraw = true;
 bool done = false;
-
-void test_init(bool test, char *message)
-// Testa retorno de função de inicialização do Allegro
-{
-    if (!test)
-    {
-        fprintf(stderr, "Erro ao inicializar %s :(\n", message);
-        exit(1);
-    }
-}
 
 void state_initialize()
 // Inicializa todas as variáveis e structs necessárias para o jogo
@@ -33,6 +27,9 @@ void state_initialize()
 
     // inicializa teclado
     test_init(al_install_keyboard(), "teclado");
+
+    // inicializa addon de imagens
+    test_init(al_init_image_addon(), "addon de imagem");
 
     // inicializa timer de 1/FRAMERATE segundos
     timer = al_create_timer(FRAMERATE);
@@ -57,7 +54,12 @@ void state_initialize()
     // inicializa variáveis de controle
     al_start_timer(timer);
 
+    // le mapa do jogo
     read_map(&map);
+
+    // inicializa sprites
+    initialize_sprites(&sprites);
+    init_sprites(&sprites);
 }
 
 void state_play()
@@ -86,8 +88,12 @@ void state_play()
         // desenhar na tela
         if (redraw)
         {
-            al_clear_to_color(al_map_rgb(106, 13, 176));
-            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Hello World!");
+            al_clear_to_color(al_map_rgb(255, 255, 255));
+//          al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Hello World!");
+
+            draw_map(&sprites, &map);
+//          al_draw_bitmap(sprites.border, 20, 20, 0);
+
             al_flip_display();
         }
     }
@@ -99,6 +105,8 @@ void state_end()
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
+
+    destroy_sprites(&sprites);
 
     destroy_map(&map);
 
