@@ -1,10 +1,13 @@
-#include "sprites.h"
-
 #ifndef __MAP__
 #define __MAP__
 
-#define BORDER '#'
-#define BLANK  ' '
+#define BORDER  '#'
+#define BLANK   ' '
+#define DIRT    '.'
+#define BOULDER 'O'
+#define WALL    '|'
+#define DIAMOND 'D'
+#define PLAYER  '@'
 
 typedef struct map_s{
     int width;   // largura do mapa
@@ -15,8 +18,5 @@ typedef struct map_s{
 void read_map(map_t *map);
 
 void destroy_map(map_t *map);
-
-void draw_map(sprites_t *sprites, map_t *map);
-//void print_map(map_t *map);
 
 #endif

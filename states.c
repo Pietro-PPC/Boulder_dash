@@ -9,6 +9,7 @@
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
+ALLEGRO_BITMAP *buffer;
 ALLEGRO_FONT* font;
 ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_EVENT event;
@@ -39,6 +40,10 @@ void state_initialize()
     disp = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
     test_init(disp, "tela de jogo");
 
+    // inicializa buffer intermediario
+    buffer = al_create_bitmap(BUFFER_WIDTH, BUFFER_HEIGHT);
+    test_init(buffer, "buffer intermediario");
+
     // inicializa fonte built-in
     font = al_create_builtin_font();
     test_init(font, "fonte");
@@ -59,7 +64,7 @@ void state_initialize()
 
     // inicializa sprites
     initialize_sprites(&sprites);
-    init_sprites(&sprites);
+    init_sprites(&sprites, &map, disp);
 }
 
 void state_play()
@@ -89,12 +94,10 @@ void state_play()
         if (redraw)
         {
             al_clear_to_color(al_map_rgb(255, 255, 255));
-//          al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Hello World!");
 
+            pre_draw(buffer);
             draw_map(&sprites, &map);
-//          al_draw_bitmap(sprites.border, 20, 20, 0);
-
-            al_flip_display();
+            post_draw(buffer, disp);
         }
     }
 }
@@ -103,6 +106,7 @@ void state_end()
 {
     al_destroy_font(font);
     al_destroy_display(disp);
+    al_destroy_bitmap(buffer);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 

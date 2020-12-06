@@ -2,8 +2,13 @@
 #define __STATES__
 
 #define FRAMERATE 1.0/60.0
-#define DISPLAY_WIDTH  1280 
-#define DISPLAY_HEIGHT 800
+
+#define BUFFER_WIDTH  360
+#define BUFFER_HEIGHT 240
+
+#define SCALE 3
+#define DISPLAY_WIDTH  BUFFER_WIDTH * SCALE 
+#define DISPLAY_HEIGHT BUFFER_HEIGHT * SCALE
 
 void state_initialize();
 
