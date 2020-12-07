@@ -1,8 +1,8 @@
 CFLAGS = -Wall -std=c99
 PKG_CONFIG=`pkg-config allegro-5 allegro_font-5 allegro_image-5 --libs --cflags`
 
-all: main.c states.o map.o sprites.o error_msg.o draw.o
-	gcc main.c states.o map.o sprites.o error_msg.o draw.o -o boulder_dash $(PKG_CONFIG) $(CFLAGS)
+all: main.c states.o map.o sprites.o error_msg.o draw.o entities.o
+	gcc main.c states.o map.o sprites.o error_msg.o draw.o entities.o -o boulder_dash $(PKG_CONFIG) $(CFLAGS)
 
 states.o: states.c states.h
 	gcc -c states.c $(CFLAGS)
@@ -18,6 +18,9 @@ error_msg.o: error_msg.c error_msg.h
 
 draw.o: draw.c draw.h
 	gcc -c draw.c $(CFLAGS)
+
+entities.o: entities.c entities.h
+	gcc -c entities.c $(CFLAGS)
 
 clean:
 	rm -f *.o

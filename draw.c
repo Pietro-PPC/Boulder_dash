@@ -4,6 +4,7 @@
 #include "sprites.h"
 #include "draw.h"
 #include "states.h"
+#include <stdio.h>
 
 void pre_draw(ALLEGRO_BITMAP *bitmap)
 {

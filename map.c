@@ -6,6 +6,7 @@
 #include "error_msg.h"
 #include "map.h"
 #include "sprites.h"
+#include "entities.h"
 
 void initialize_map(map_t *map)
 {
@@ -32,7 +33,8 @@ void allocate_map(map_t *map)
         map->m[i] = map->m[0] + i * map->width;
 }
 
-void read_map(map_t *map)
+void read_map(map_t *map, player_t *p)
+/* ATUALIZAR: lidar com mais de um player ou 0 players no campo */
 {
     FILE *f;
     char filename[101] = "levelmaps/";
@@ -50,14 +52,63 @@ void read_map(map_t *map)
     // Inicializa mapa com valores em branco
     memset(map->m[0], BLANK, map->width * map->height + 1);
 
-    int i;
+    int i, aux;
     for (i = 0; i < map->height && !feof(f); ++i)
     {
         fgets(map->m[i], map->width + 1, f);
+        aux = strcspn(map->m[i], "@");
+        if (aux < strlen(map->m[i]))
+        {
+            p->x = aux;
+            p->y = i;
+        }
 
         // itera para proxima linha ou fim de arquivo
         while(getc(f) != '\n' && !feof(f));
     }
+}
+
+#define P_TIMER 6
+
+void update_map(map_t *map, player_t *p, unsigned char *key)
+{
+    if (!p->timer)
+    {
+        if (key[ALLEGRO_KEY_LEFT])
+        {
+            map->m[p->y][p->x - 1] = PLAYER;
+            map->m[p->y][p->x] = BLANK;
+            (p->x)--;
+            p->timer = P_TIMER;
+        }
+        else if (key[ALLEGRO_KEY_RIGHT])
+        {
+            map->m[p->y][p->x + 1] = PLAYER;
+            map->m[p->y][p->x] = BLANK;
+            (p->x)++;
+            p->timer = P_TIMER;
+        }
+        else if (key[ALLEGRO_KEY_UP])
+        {
+            map->m[p->y - 1][p->x] = PLAYER;
+            map->m[p->y][p->x] = BLANK;
+            (p->y)--;
+            p->timer = P_TIMER;
+        }
+        else if (key[ALLEGRO_KEY_DOWN])
+        {
+            map->m[p->y + 1][p->x] = PLAYER;
+            map->m[p->y][p->x] = BLANK;
+            (p->y)++;
+            p->timer = P_TIMER;
+        }
+
+        for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
+            key[i] &= KEY_SEEN;
+    }
+    else
+        p->timer--;
+        
 }
 
 void destroy_map(map_t *map)

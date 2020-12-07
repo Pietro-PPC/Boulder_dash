@@ -6,6 +6,7 @@
 #include "error_msg.h"
 #include "sprites.h"
 #include "draw.h"
+#include "entities.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
@@ -19,6 +20,8 @@ sprites_t sprites;
 
 bool redraw = true;
 bool done = false;
+
+player_t p1;
 
 void state_initialize()
 // Inicializa todas as variáveis e structs necessárias para o jogo
@@ -59,16 +62,24 @@ void state_initialize()
     // inicializa variáveis de controle
     al_start_timer(timer);
 
+    init_player(&p1);
+
     // le mapa do jogo
-    read_map(&map);
+    read_map(&map, &p1);
 
     // inicializa sprites
     initialize_sprites(&sprites);
     init_sprites(&sprites, &map, disp);
+
 }
+
+long int frame = 0;
 
 void state_play()
 {
+    unsigned char key[ALLEGRO_KEY_MAX];
+    memset(key, 0, ALLEGRO_KEY_MAX);
+    
     // loop principal
     while(true)
     {
@@ -78,11 +89,19 @@ void state_play()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
+                update_map(&map, &p1, key);
                 redraw = true;
                 break;
             
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
             case ALLEGRO_EVENT_KEY_DOWN:
+                key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
+                break;
+            
+            case ALLEGRO_EVENT_KEY_UP:
+                key[event.keyboard.keycode] &= KEY_RELEASED;
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 done = true;
                 break;
         }
@@ -98,6 +117,8 @@ void state_play()
             pre_draw(buffer);
             draw_map(&sprites, &map);
             post_draw(buffer, disp);
+
+            redraw = false;
         }
     }
 }
