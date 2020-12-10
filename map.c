@@ -125,19 +125,33 @@ void update_player_speed(map_t *map, unsigned char *key)
     {
         char left_tile = map->m[*y][*x - 1].type;
         if (!test_solid(left_tile))
+        {
             map->m[*y][*x].dx = -1;
-        else
+            map->timer = 12;
+        }
+        else if (left_tile == BOULDER && map->m[*y][*x-2].type == BLANK)
+        {
+            map->m[*y][*x].dx = -1;
+            map->timer = 12;
+        }
+        else     
             map->m[*y][*x].dx = 0;
-        map->timer = 12;
     }
     else if (key[ALLEGRO_KEY_RIGHT])
     {
         char right_tile = map->m[*y][*x + 1].type;
         if (!test_solid(right_tile))
+        {
             map->m[*y][*x].dx = 1;
+            map->timer = 12;
+        }
+        else if (right_tile == BOULDER && map->m[*y][*x+2].type == BLANK)
+        {
+            map->m[*y][*x].dx = 1;
+            map->timer = 12;
+        }
         else
             map->m[*y][*x].dx = 0;
-        map->timer = 12;
     }
     else if (key[ALLEGRO_KEY_UP])
     {
@@ -166,8 +180,21 @@ void update_boulder_speed(map_t *map, int i, int j)
         map->m[i][j].dy = 1;
         map->timer = 12;
     }
+    else if (map->m[i][j-1].type == PLAYER && map->m[i][j-1].dx == 1)
+    {
+        map->m[i][j].dx = 1;
+        map->timer = 12;
+    }
+    else if (map->m[i][j+1].type == PLAYER && map->m[i][j+1].dx == -1)
+    {
+        map->m[i][j].dx = -1;
+        map->timer = 12;
+    }
     else
+    {
         map->m[i][j].dy = 0;
+        map->m[i][j].dx = 0;
+    }
 }
 
 void update_tiles_speed(map_t *map, unsigned char *key)

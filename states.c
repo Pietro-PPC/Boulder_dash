@@ -104,7 +104,7 @@ void state_play()
                 }
                 else
                     //transition(map->timer);
-                    printf("%d\n", (map.timer)--);
+                    map.timer--;
                 
                 redraw = true;
                 break;
@@ -121,6 +121,8 @@ void state_play()
                 done = true;
                 break;
         }
+        if (key[ALLEGRO_KEY_ESCAPE])
+            done = true;
 
         if (done)
             break;
