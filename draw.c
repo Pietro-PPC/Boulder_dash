@@ -25,6 +25,8 @@ void draw_map(sprites_t *sprites, map_t *map)
 {
     al_draw_bitmap(sprites->background, 0, 0, 0);
 
+    map->cur_m = (map->cur_m + 1)%2;
+    int cur_m = map->cur_m;
     int x, y;
     for (int i = 0; i < map->height; ++i)
     {
@@ -32,7 +34,7 @@ void draw_map(sprites_t *sprites, map_t *map)
         {
             x = TILE_S*j;
             y = TILE_S*i;
-            switch (map->m[0][i][j].type)
+            switch (map->m[cur_m][i][j].type)
             {
                 case BORDER: 
                     al_draw_bitmap(sprites->border, x, y, 0);

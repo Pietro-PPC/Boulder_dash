@@ -25,7 +25,8 @@ typedef struct map_s
     int player_x;  // coordenada x (vertical) do jogador
     int player_y;  // coordenada y (horizontal) do jogador
     int timer;     // temporizador para mudança de lugar das variáveis
-    tile_t **m[2]; // mapa tem dois estados
+    int cur_m;     // zero para m[0] e 1 para m[1]
+    tile_t **m[2]; // matriz de estado atual e estado anterior
 } map_t;
 
 void initialize_map(map_t *map);
