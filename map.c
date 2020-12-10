@@ -208,7 +208,6 @@ void update_tiles_speed(map_t *map, unsigned char *key)
                 case BOULDER:
                     update_boulder_speed(map, i, j);
                     break;
-                
             }
         }
 }
