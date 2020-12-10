@@ -77,38 +77,6 @@ void read_map(map_t *map)
     }
 }
 
-/*
-int *x = &(map->player_x);
-    int *y = &(map->player_y);
-    if (key[ALLEGRO_KEY_LEFT])
-    {
-        map->m[*y][*x - 1].type = PLAYER;
-        map->m[*y][*x].type = BLANK;
-        (*x)--;
-        map->timer = 12;
-    }
-    else if (key[ALLEGRO_KEY_RIGHT])
-    {
-        map->m[*y][*x + 1].type = PLAYER;
-        map->m[*y][*x].type = BLANK;
-        (*x)++;
-        map->timer = 12;
-    }
-    else if (key[ALLEGRO_KEY_UP])
-    {
-        map->m[*y - 1][*x].type = PLAYER;
-        map->m[*y][*x].type = BLANK;
-        (*y)--;
-        map->timer = 12;
-    }
-    else if (key[ALLEGRO_KEY_DOWN])
-    {
-        map->m[*y + 1][*x].type = PLAYER;
-        map->m[*y][*x].type = BLANK;
-        (*y)++;
-        map->timer = 12;
-    }
-*/
 int test_solid(char c)
 {
     return (c == BOULDER ||
@@ -171,6 +139,12 @@ void update_player_speed(map_t *map, unsigned char *key)
             map->m[*y][*x].dy = 0;
         map->timer = 12;
     }
+    else
+    {
+        map->m[*y][*x].dy = 0;
+        map->m[*y][*x].dx = 0;
+    }
+    
 }
 
 void update_boulder_speed(map_t *map, int i, int j)
@@ -216,13 +190,36 @@ void update_tiles_position(map_t *map)
 {
     for (int i = 0; i < map->height; ++i)
         for (int j = 0; j < map->width; ++j)
+            map->m[i][j].visited = 0;
+
+    for (int i = 0; i < map->height; ++i)
+        for (int j = 0; j < map->width; ++j)
         {
+            tile_t *curr = &(map->m[i][j]);
+            if (curr->visited)
+                continue;
+            curr->visited = 1;
+
             int *px = &(map->player_x);
             int *py = &(map->player_y);
-            tile_t *curr = &(map->m[i][j]);
 
             if (curr->dx > 0)
             {
+                if (map->m[i][j+1].type == BOULDER)
+                {
+                    if (map->m[i][j+1].dx == 1)
+                    {
+                        map->m[i][j+2].type = BOULDER;
+                        map->m[i][j+2].visited = 1;
+                    }
+                    else if (map->m[i][j+1].dy == 1)
+                    {
+                        map->m[i+1][j+1].type = BOULDER;
+                        map->m[i+1][j+1].visited = 1;
+                    }
+                }
+                
+                map->m[i][j+1].visited = 1;
                 map->m[i][j+1].type = curr->type;
                 if (curr->type == PLAYER)
                     (*px)++;
