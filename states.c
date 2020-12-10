@@ -6,7 +6,6 @@
 #include "error_msg.h"
 #include "sprites.h"
 #include "draw.h"
-#include "entities.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
@@ -20,8 +19,6 @@ sprites_t sprites;
 
 bool redraw = true;
 bool done = false;
-
-player_t p1;
 
 void state_initialize()
 // Inicializa todas as variáveis e structs necessárias para o jogo
@@ -62,18 +59,27 @@ void state_initialize()
     // inicializa variáveis de controle
     al_start_timer(timer);
 
-    init_player(&p1);
-
     // le mapa do jogo
-    read_map(&map, &p1);
+    initialize_map(&map);
+    read_map(&map);
 
     // inicializa sprites
     initialize_sprites(&sprites);
     init_sprites(&sprites, &map, disp);
 
 }
-
-long int frame = 0;
+/*
+void print_map(map_t *map)
+{
+    for (int i = 0; i < map->height; ++i)
+    {
+        for (int j = 0; j < map->width; ++j)
+        {
+            printf("%c", map->m[i][j].type);
+        }
+        printf("\n");
+    }
+}*/
 
 void state_play()
 {
@@ -81,6 +87,7 @@ void state_play()
     memset(key, 0, ALLEGRO_KEY_MAX);
     
     // loop principal
+    //print_map(&map);
     while(true)
     {
         al_wait_for_event(queue, &event);
@@ -89,7 +96,16 @@ void state_play()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-                update_map(&map, &p1, key);
+                if (!(map.timer))
+                {
+                    update_map(&map, key);
+                    for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
+                        key[i] &= KEY_SEEN;
+                }
+                else
+                    //transition(map->timer);
+                    printf("%d\n", (map.timer)--);
+                
                 redraw = true;
                 break;
             
@@ -112,12 +128,9 @@ void state_play()
         // desenhar na tela
         if (redraw)
         {
-            al_clear_to_color(al_map_rgb(255, 255, 255));
-
             pre_draw(buffer);
             draw_map(&sprites, &map);
             post_draw(buffer, disp);
-
             redraw = false;
         }
     }

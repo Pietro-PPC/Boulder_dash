@@ -1,5 +1,3 @@
-#include "entities.h"
-
 #ifndef __MAP__
 #define __MAP__
  
@@ -13,15 +11,28 @@
 
 #define LEVELFILE "level_1.txt"
 
-typedef struct map_s{
+typedef struct tile_s
+{
+    int dx, dy;
+    char type;
+    int visited;
+} tile_t;
+
+typedef struct map_s
+{
     int width;    // largura do mapa
     int height;   // altura do mapa
-    char **m;     // matriz do mapa
+    int player_x;
+    int player_y;
+    int timer;    // temporizador para mudança de lugar das variáveis
+    tile_t **m;   // matriz do mapa
 } map_t;
 
-void read_map(map_t *map, player_t *p);
+void initialize_map(map_t *map);
 
-void update_map(map_t *map, player_t *p, unsigned char *key);
+void read_map(map_t *map);
+
+void update_map(map_t *map, unsigned char *key);
 
 void destroy_map(map_t *map);
 

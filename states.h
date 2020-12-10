@@ -10,6 +10,9 @@
 #define DISPLAY_WIDTH  BUFFER_WIDTH * SCALE 
 #define DISPLAY_HEIGHT BUFFER_HEIGHT * SCALE
 
+#define KEY_SEEN 1
+#define KEY_RELEASED 2
+
 void state_initialize();
 
 void state_play();
