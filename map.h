@@ -20,12 +20,12 @@ typedef struct tile_s
 
 typedef struct map_s
 {
-    int width;    // largura do mapa
-    int height;   // altura do mapa
-    int player_x;
-    int player_y;
-    int timer;    // temporizador para mudança de lugar das variáveis
-    tile_t **m;   // matriz do mapa
+    int width;     // largura do mapa
+    int height;    // altura do mapa
+    int player_x;  // coordenada x (vertical) do jogador
+    int player_y;  // coordenada y (horizontal) do jogador
+    int timer;     // temporizador para mudança de lugar das variáveis
+    tile_t **m[2]; // mapa tem dois estados
 } map_t;
 
 void initialize_map(map_t *map);

@@ -32,7 +32,7 @@ void draw_map(sprites_t *sprites, map_t *map)
         {
             x = TILE_S*j;
             y = TILE_S*i;
-            switch (map->m[i][j].type)
+            switch (map->m[0][i][j].type)
             {
                 case BORDER: 
                     al_draw_bitmap(sprites->border, x, y, 0);

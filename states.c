@@ -98,7 +98,7 @@ void state_play()
             case ALLEGRO_EVENT_TIMER:
                 if (!(map.timer))
                 {
-                    update_map(&map, key);
+                    //update_map(&map, key);
                     for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
                         key[i] &= KEY_SEEN;
                 }

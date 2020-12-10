@@ -12,25 +12,8 @@ void initialize_map(map_t *map)
     map->width = 0;
     map->height = 0;
     map->timer = 0;
-    map->m = NULL;
-}
-
-void allocate_map(map_t *map)
-{
-    if (!map->width || !map->height)
-        fatal_error("Mapa sem dimensões");
-
-    map->m = malloc(map->height * sizeof(tile_t *));
-    if (!map)
-        fatal_error("Falha ao alocar mapa");
-
-    // +1 para armazenar o \0 ao final
-    map->m[0] = malloc(map->width * map->height * sizeof(tile_t) + 1); 
-    if (!map->m[0])
-        fatal_error("Falha ao alocar mapa");
-
-    for (int i = 1; i < map->height; ++i)
-        map->m[i] = map->m[0] + i * map->width;
+    map->m[0] = NULL;
+    map->m[1] = NULL;
 }
 
 void initialize_tile(tile_t *t)
@@ -40,6 +23,30 @@ void initialize_tile(tile_t *t)
     t->type = BLANK;
 }
 
+void initialize_map_matrix(tile_t **m, int w, int h)
+{
+    for (int i = 0; i < h; ++i)
+        for (int j = 0; j < w; ++j)
+            initialize_tile(&(m[i][j]));
+}
+
+void allocate_map(tile_t ***map, int w, int h)
+{
+    // Alocar ponteiros para linhas
+    (*map) = malloc(h * sizeof(tile_t *));
+    if (!*map)
+        fatal_error("Falha ao alocar mapa");
+    
+    // Alocar matriz 
+    (*map)[0] = malloc(w * h * sizeof(tile_t)); 
+    if (!(*map)[0])
+        fatal_error("Falha ao alocar mapa");
+    
+    // Assinalar ponteiros aos 
+    for (int i = 1; i < h; ++i)
+        (*map)[i] = (*map)[0] + i * w;
+}
+
 void read_map(map_t *map)
 /* ATUALIZAR: lidar com mais de um player ou 0 players no campo */
 {
@@ -47,26 +54,32 @@ void read_map(map_t *map)
     char filename[101] = "levelmaps/";
     strcat(filename, LEVELFILE);
 
+    // Abre arquivo do nível
     f = fopen(filename, "r");
     if (!f)
         fatal_error("Falha ao abrir mapa");
 
-    // lê linha com largura e altura e pula para a próxima
+    // lê linha com largura e altura e pula para a próxima linha
     fscanf(f, "%d %d", &(map->width), &(map->height));
     while(getc(f) != '\n' && !feof(f));
-    allocate_map(map);
 
-    // Inicializa mapa com valores em branco
-    for (int i = 0; i < map->height; ++i)
-        for (int j = 0; j < map->width; ++j)
-            initialize_tile(&(map->m[i][j]));
+    // Testa dimensões do mapa e aloca caso sejam não nulas
+    if (!map->width || !map->height)
+        fatal_error("Mapa sem dimensões");
+    allocate_map(&(map->m[0]), map->width, map->height);
+    allocate_map(&(map->m[1]), map->width, map->height);
 
+    // Inicializa mapas com valores em branco
+    initialize_map_matrix(map->m[0], map->width, map->height);
+    initialize_map_matrix(map->m[1], map->width, map->height);
+
+    tile_t **initMap = map->m[0];
     for (int i = 0; i < map->height && !feof(f); ++i)
     {
         for (int j = 0; j < map->width; ++j)
         {
-            map->m[i][j].type = getc(f);
-            if (map->m[i][j].type == PLAYER)
+            initMap[i][j].type = getc(f);
+            if (initMap[i][j].type == PLAYER)
             {
                 map->player_y = i;
                 map->player_x = j;
@@ -84,7 +97,7 @@ int test_solid(char c)
             c == BORDER);
 }
 
-
+/*arrumar
 void update_player_speed(map_t *map, unsigned char *key)
 {
     int *x = &(map->player_x);
@@ -256,16 +269,24 @@ void update_map(map_t *map, unsigned char *key)
     //printf("oi\n");
 }
 
+*/
+
+void destroy_map_matrix(tile_t ***m, int w, int h)
+{
+    for (int i = 1; i < h; ++i)
+        (*m)[i] = NULL;
+    
+    if ((*m)[0])
+        free((*m)[0]);
+    (*m)[0] = NULL;
+
+    if ((*m))
+        free((*m));
+    (*m) = NULL;
+}
+
 void destroy_map(map_t *map)
 {
-    for (int i = 1; i < map->height; ++i)
-        map->m[i] = NULL;
-    
-    if (map->m[0])
-        free(map->m[0]);
-    map->m[0] = NULL;
-
-    if (map->m)
-        free(map->m);
-    map->m = NULL;
+    destroy_map_matrix(&(map->m[0]), map->width, map->height);
+    destroy_map_matrix(&(map->m[1]), map->width, map->height);
 }
