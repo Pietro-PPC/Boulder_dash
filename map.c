@@ -17,35 +17,46 @@ void initialize_map(map_t *map)
     map->m[1] = NULL;
 }
 
-void initialize_tile(tile_t *t)
+void initialize_tile_blank(tile_t *t)
 {
     t->dx = 0;
     t->dy = 0;
     t->type = BLANK;
+    t->visited = 0;
+}
+void initialize_tile_border(tile_t *t)
+{
+    t->dx = 0;
+    t->dy = 0;
+    t->type = BORDER;
+    t->visited = 0;
 }
 
 void initialize_map_matrix(tile_t **m, int w, int h)
 {
-    for (int i = 0; i < h; ++i)
-        for (int j = 0; j < w; ++j)
-            initialize_tile(&(m[i][j]));
+    for (int i = 0; i < h+2; ++i)
+        for (int j = 0; j < w+2; ++j)
+            if (i == 0 || i > h || j == 0 || j > w)
+                initialize_tile_border(&(m[i][j]));
+            else
+                initialize_tile_blank(&(m[i][j]));
 }
 
 void allocate_map(tile_t ***map, int w, int h)
 {
     // Alocar ponteiros para linhas
-    (*map) = malloc(h * sizeof(tile_t *));
+    (*map) = malloc((h+2) * sizeof(tile_t *));
     if (!*map)
         fatal_error("Falha ao alocar mapa");
     
     // Alocar matriz 
-    (*map)[0] = malloc(w * h * sizeof(tile_t)); 
+    (*map)[0] = malloc((w+2) * (h+2) * sizeof(tile_t)); 
     if (!(*map)[0])
         fatal_error("Falha ao alocar mapa");
     
-    // Assinalar ponteiros aos 
-    for (int i = 1; i < h; ++i)
-        (*map)[i] = (*map)[0] + i * w;
+    // Assinalar ponteiros às linhas
+    for (int i = 1; i < (h+2); ++i)
+        (*map)[i] = (*map)[0] + i * (w+2);
 }
 
 void read_map(map_t *map)
@@ -74,10 +85,10 @@ void read_map(map_t *map)
     initialize_map_matrix(map->m[0], map->width, map->height);
     initialize_map_matrix(map->m[1], map->width, map->height);
 
-    tile_t **initMap = map->m[0];
-    for (int i = 0; i < map->height && !feof(f); ++i)
+    tile_t **initMap = map->m[map->cur_m];
+    for (int i = 1; i <= map->height && !feof(f); ++i)
     {
-        for (int j = 0; j < map->width; ++j)
+        for (int j = 1; j <= map->width; ++j)
         {
             initMap[i][j].type = getc(f);
             if (initMap[i][j].type == PLAYER)
@@ -91,107 +102,105 @@ void read_map(map_t *map)
     }
 }
 
-int test_solid(char c)
+int test_walkable(tile_t *t)
 {
-    return (c == BOULDER ||
-            c == WALL ||
-            c == BORDER);
+    char c = t->type;
+    return !(c == BOULDER ||
+             c == WALL ||
+             c == BORDER);
 }
 
-/*arrumar
+int test_solid(tile_t *t)
+{
+    char c = t->type;
+    return (c == BOULDER ||
+            c == WALL || 
+            c == BORDER || 
+            c == DIRT);
+}
+
 void update_player_speed(map_t *map, unsigned char *key)
 {
-    int *x = &(map->player_x);
-    int *y = &(map->player_y);
-    if (key[ALLEGRO_KEY_LEFT])
+    tile_t **mat = map->m[map->cur_m];
+    int x = map->player_x;
+    int y = map->player_y;
+    tile_t *cur = &(mat[y][x]);
+
+    cur->dy = 0;
+    cur->dx = 0;
+
+    if (key[ALLEGRO_KEY_LEFT] && x > 1)
     {
-        char left_tile = map->m[*y][*x - 1].type;
-        if (!test_solid(left_tile))
-        {
-            map->m[*y][*x].dx = -1;
-            map->timer = 12;
-        }
-        else if (left_tile == BOULDER && map->m[*y][*x-2].type == BLANK)
-        {
-            map->m[*y][*x].dx = -1;
-            map->timer = 12;
-        }
-        else     
-            map->m[*y][*x].dx = 0;
+        tile_t *left = &(mat[y][x - 1]);
+        tile_t *left_left = &(mat[y][x - 2]);
+
+        if (test_walkable(left) ||
+            (left->type == BOULDER && left_left->type == BLANK))
+            cur->dx = -1;
     }
-    else if (key[ALLEGRO_KEY_RIGHT])
+    else if (key[ALLEGRO_KEY_RIGHT] && x < map->width)
     {
-        char right_tile = map->m[*y][*x + 1].type;
-        if (!test_solid(right_tile))
-        {
-            map->m[*y][*x].dx = 1;
-            map->timer = 12;
-        }
-        else if (right_tile == BOULDER && map->m[*y][*x+2].type == BLANK)
-        {
-            map->m[*y][*x].dx = 1;
-            map->timer = 12;
-        }
-        else
-            map->m[*y][*x].dx = 0;
+        tile_t *right = &(mat[y][x + 1]);
+        tile_t *right_right = &(mat[y][x + 2]);
+        
+        if (test_walkable(right) ||
+            (right->type == BOULDER && right_right->type == BLANK))
+            cur->dx = 1;
     }
-    else if (key[ALLEGRO_KEY_UP])
+    else if (key[ALLEGRO_KEY_UP] && y > 1)
     {
-        char up_tile = map->m[*y - 1][*x].type;
-        if (!test_solid(up_tile))
-            map->m[*y][*x].dy = -1;
-        else
-            map->m[*y][*x].dy = 0;
-        map->timer = 12;
+        tile_t *up = &(mat[y - 1][x]);
+        if (test_walkable(up))
+            cur->dy = -1;
     }
-    else if (key[ALLEGRO_KEY_DOWN])
+    else if (key[ALLEGRO_KEY_DOWN] && y < map->height)
     {
-        char down_tile = map->m[*y + 1][*x].type;
-        if (!test_solid(down_tile))
-            map->m[*y][*x].dy = 1;
-        else
-            map->m[*y][*x].dy = 0;
-        map->timer = 12;
+        tile_t *down = &(mat[y + 1][x]);
+        if (test_walkable(down))
+            cur->dy = 1;
     }
-    else
+
+    if(cur->dy || cur->dx)
     {
-        map->m[*y][*x].dy = 0;
-        map->m[*y][*x].dx = 0;
+        map->timer = MAP_TIMER;
+        printf("%d %d\n", cur->dy, cur->dx);
     }
-    
 }
 
-void update_boulder_speed(map_t *map, int i, int j)
+void update_boulder_speed(map_t *map, int y, int x)
 {
-    if (map->m[i+1][j].type == BLANK)
-    {
-        map->m[i][j].dy = 1;
-        map->timer = 12;
-    }
-    else if (map->m[i][j-1].type == PLAYER && map->m[i][j-1].dx == 1)
-    {
-        map->m[i][j].dx = 1;
-        map->timer = 12;
-    }
-    else if (map->m[i][j+1].type == PLAYER && map->m[i][j+1].dx == -1)
-    {
-        map->m[i][j].dx = -1;
-        map->timer = 12;
-    }
-    else
-    {
-        map->m[i][j].dy = 0;
-        map->m[i][j].dx = 0;
-    }
+    tile_t **mat = map->m[map->cur_m];
+    tile_t *cur = &(mat[y][x]);
+    tile_t *left = &(mat[y][x-1]);
+    tile_t *right = &(mat[y][x+1]);
+
+    cur->dx = 0;
+    cur->dy = 0;
+
+    if (left->type == BLANK)
+        cur->dy = 1;
+    else if (left->type == PLAYER && left->dx == 1)
+        cur->dx = 1;
+    else if (right->type == PLAYER && right->dx == -1)
+        cur->dx = -1;
+
+    if (cur->dx || cur->dy)
+        map->timer = MAP_TIMER;
 }
 
 void update_tiles_speed(map_t *map, unsigned char *key)
 {
+    tile_t **mat = map->m[map->cur_m];
     update_player_speed(map, key);
-    for (int i = 0; i < map->height; ++i)
-        for (int j = 0; j < map->width; ++j)
+
+//    printf("%d %d\n", map->player_y, map->player_x);
+//    if (map->m[map->cur_m][map->player_y][map->player_x].dx)
+//        printf("%d\n", map->m[map->cur_m][map->player_y][map->player_x].dx);
+
+    for (int i = 1; i <= map->height; ++i)
+        for (int j = 1; j <= map->width; ++j)
         {
-            switch(map->m[i][j].type)
+            switch(mat[i][j].type)
             {
                 case BOULDER:
                     update_boulder_speed(map, i, j);
@@ -200,77 +209,67 @@ void update_tiles_speed(map_t *map, unsigned char *key)
         }
 }
 
+void assign_tile(tile_t *d, tile_t *s)
+{
+    d->dx = s->dx;
+    d->dy = s->dy;
+    d->type = s->type;
+}
+
 void update_tiles_position(map_t *map)
 {
-    for (int i = 0; i < map->height; ++i)
-        for (int j = 0; j < map->width; ++j)
-            map->m[i][j].visited = 0;
+    int next = (map->cur_m+1)%2;
+    int cur = map->cur_m;
 
-    for (int i = 0; i < map->height; ++i)
-        for (int j = 0; j < map->width; ++j)
+    tile_t **cur_mat = map->m[cur];
+    tile_t **next_mat = map->m[next];
+    
+    initialize_map_matrix(next_mat, map->width, map->height);
+
+    for (int i = 1; i <= map->height; ++i)
+        for (int j = 1; j <= map->width; ++j)
         {
-            tile_t *curr = &(map->m[i][j]);
-            if (curr->visited)
-                continue;
-            curr->visited = 1;
-
-            int *px = &(map->player_x);
-            int *py = &(map->player_y);
-
-            if (curr->dx > 0)
+            tile_t *cur_tile = &(cur_mat[i][j]);
+            if (cur_tile->dx || cur_tile->dy)
             {
-                if (map->m[i][j+1].type == BOULDER)
+                if (cur_tile->type == PLAYER)
                 {
-                    if (map->m[i][j+1].dx == 1)
-                    {
-                        map->m[i][j+2].type = BOULDER;
-                        map->m[i][j+2].visited = 1;
-                    }
-                    else if (map->m[i][j+1].dy == 1)
-                    {
-                        map->m[i+1][j+1].type = BOULDER;
-                        map->m[i+1][j+1].visited = 1;
-                    }
+                    map->player_x = map->player_x + cur_tile->dx;
+                    map->player_y = map->player_y + cur_tile->dy;
                 }
-                
-                map->m[i][j+1].visited = 1;
-                map->m[i][j+1].type = curr->type;
-                if (curr->type == PLAYER)
-                    (*px)++;
-                initialize_tile(curr);
-            }
-            else if (curr->dx < 0)
-            {
-                map->m[i][j-1].type = curr->type;
-                if (curr->type == PLAYER)
-                    (*px)--;
-                initialize_tile(curr);
-            }
-            else if (curr->dy > 0)
-            {
-                map->m[i+1][j].type = curr->type;
-                if (curr->type == PLAYER)
-                    (*py)++;
-                initialize_tile(curr);
-            }
-            else if (curr->dy < 0)
-            {
-                map->m[i-1][j].type = curr->type;
-                if (curr->type == PLAYER)
-                    (*py)--;
-                initialize_tile(curr);
+                tile_t *next_tile = &(next_mat[i+cur_tile->dy][j+cur_tile->dx]);
+                assign_tile(next_tile, cur_tile);
+                next_tile->visited = 1;
             }
         }
+
+    // Loop para tiles dinâmicos
+    for (int i = 1; i <= map->height; ++i)
+        for (int j = 1; j <= map->width; ++j)
+        {
+            tile_t *cur_tile = &(cur_mat[i][j]);
+            tile_t *next_tile = &(next_mat[i][j]);
+            
+            if (!cur_tile->dx && !cur_tile->dy && !next_tile->visited)
+            {
+                assign_tile(next_tile, cur_tile);
+                next_tile->visited = 1;
+            }
+        }
+}
+
+
+void flip_map_matrix(map_t *map)
+{
+    map->cur_m = (map->cur_m + 1) % 2;
 }
 
 void update_map(map_t *map, unsigned char *key)
 {
     update_tiles_position(map);
+    flip_map_matrix(map);
     update_tiles_speed(map, key);
-    //printf("oi\n");
 }
-
-*/
 
 void destroy_map_matrix(tile_t ***m, int w, int h)
 {

@@ -25,15 +25,14 @@ void draw_map(sprites_t *sprites, map_t *map)
 {
     al_draw_bitmap(sprites->background, 0, 0, 0);
 
-    map->cur_m = (map->cur_m + 1)%2;
     int cur_m = map->cur_m;
     int x, y;
-    for (int i = 0; i < map->height; ++i)
+    for (int i = 1; i <= map->height; ++i)
     {
-        for (int j = 0; j < map->width; ++j)
+        for (int j = 1; j <= map->width; ++j)
         {
-            x = TILE_S*j;
-            y = TILE_S*i;
+            x = TILE_S*(j-1);
+            y = TILE_S*(i-1);
             switch (map->m[cur_m][i][j].type)
             {
                 case BORDER: 

@@ -10,6 +10,7 @@
 #define PLAYER  '@'
 
 #define LEVELFILE "level_1.txt"
+#define MAP_TIMER 12
 
 typedef struct tile_s
 {
@@ -25,7 +26,7 @@ typedef struct map_s
     int player_x;  // coordenada x (vertical) do jogador
     int player_y;  // coordenada y (horizontal) do jogador
     int timer;     // temporizador para mudança de lugar das variáveis
-    int cur_m;     // zero para m[0] e 1 para m[1]
+    int cur_m;     // 0 para m[0] e 1 para m[1]
     tile_t **m[2]; // matriz de estado atual e estado anterior
 } map_t;
 
