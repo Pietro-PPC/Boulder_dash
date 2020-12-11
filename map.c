@@ -173,11 +173,12 @@ void update_boulder_speed(map_t *map, int y, int x)
     tile_t *cur = &(mat[y][x]);
     tile_t *left = &(mat[y][x-1]);
     tile_t *right = &(mat[y][x+1]);
+    tile_t *down = &(mat[y+1][x]);
 
     cur->dx = 0;
     cur->dy = 0;
 
-    if (left->type == BLANK)
+    if (down->type == BLANK)
         cur->dy = 1;
     else if (left->type == PLAYER && left->dx == 1)
         cur->dx = 1;
