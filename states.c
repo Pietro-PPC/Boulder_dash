@@ -6,6 +6,7 @@
 #include "error_msg.h"
 #include "sprites.h"
 #include "draw.h"
+#include "update.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;

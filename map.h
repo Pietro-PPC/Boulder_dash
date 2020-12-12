@@ -32,9 +32,13 @@ typedef struct map_s
 
 void initialize_map(map_t *map);
 
+void initialize_map_matrix(tile_t **m, int w, int h);
+
 void read_map(map_t *map);
 
-void update_map(map_t *map, unsigned char *key);
+void assign_tile(tile_t *d, tile_t *s);
+
+int test_walkable(tile_t *t);
 
 void destroy_map(map_t *map);
 
