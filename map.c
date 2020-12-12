@@ -131,59 +131,96 @@ void update_player_speed(map_t *map, unsigned char *key)
 
     if (key[ALLEGRO_KEY_LEFT] && x > 1)
     {
-        tile_t *left = &(mat[y][x - 1]);
-        tile_t *left_left = &(mat[y][x - 2]);
-
-        if (test_walkable(left) ||
-            (left->type == BOULDER && left_left->type == BLANK))
+        if ((test_walkable(&(mat[y][x-1])) ||
+            (mat[y][x-1].type == BOULDER && mat[y][x-2].type == BLANK)) &&
+            !mat[y][x-1].visited)
             cur->dx = -1;
     }
     else if (key[ALLEGRO_KEY_RIGHT] && x < map->width)
     {
-        tile_t *right = &(mat[y][x + 1]);
-        tile_t *right_right = &(mat[y][x + 2]);
-        
-        if (test_walkable(right) ||
-            (right->type == BOULDER && right_right->type == BLANK))
+        if ((test_walkable(&(mat[y][x+1])) ||
+            (mat[y][x+1].type == BOULDER && mat[y][x+2].type == BLANK)) &&
+            !mat[y][x+1].visited)
             cur->dx = 1;
     }
     else if (key[ALLEGRO_KEY_UP] && y > 1)
     {
-        tile_t *up = &(mat[y - 1][x]);
-        if (test_walkable(up))
+        if (test_walkable(&(mat[y-1][x])) && 
+            !mat[y-1][x].visited)
             cur->dy = -1;
     }
     else if (key[ALLEGRO_KEY_DOWN] && y < map->height)
     {
-        tile_t *down = &(mat[y + 1][x]);
-        if (test_walkable(down))
+        if (test_walkable(&(mat[y+1][x])) && 
+            !mat[y+1][x].visited)
             cur->dy = 1;
     }
 
+    mat[y+cur->dy][x+cur->dx].visited = 1;
+
     if(cur->dy || cur->dx)
-    {
         map->timer = MAP_TIMER;
-        printf("%d %d\n", cur->dy, cur->dx);
-    }
+}
+
+int test_falls(tile_t *t)
+{
+    char c = t->type;
+    return (c == DIAMOND ||
+            c == BOULDER);
 }
 
 void update_boulder_speed(map_t *map, int y, int x)
 {
     tile_t **mat = map->m[map->cur_m];
     tile_t *cur = &(mat[y][x]);
-    tile_t *left = &(mat[y][x-1]);
-    tile_t *right = &(mat[y][x+1]);
-    tile_t *down = &(mat[y+1][x]);
 
     cur->dx = 0;
     cur->dy = 0;
 
-    if (down->type == BLANK)
+    if (mat[y+1][x].type == BLANK)
         cur->dy = 1;
-    else if (left->type == PLAYER && left->dx == 1)
+    else if (mat[y][x-1].type == PLAYER && mat[y][x-1].dx == 1 &&
+            !mat[y][x+1].visited)
         cur->dx = 1;
-    else if (right->type == PLAYER && right->dx == -1)
+    else if (mat[y][x+1].type == PLAYER && mat[y][x+1].dx == -1 &&
+            !mat[y][x-1].visited)
         cur->dx = -1;
+    else if (test_falls(&(mat[y+1][x])) && !test_falls(&(mat[y-1][x])) )
+    {
+        if (mat[y][x-1].type == BLANK && mat[y+1][x-1].type == BLANK &&
+            !mat[y][x-1].visited)
+            cur->dx = -1;
+        else if (mat[y][x+1].type == BLANK && mat[y+1][x+1].type == BLANK &&
+                !mat[y][x+1].visited)
+            cur->dx = 1;
+    }
+
+    mat[y+cur->dy][x+cur->dx].visited = 1;
+
+    if (cur->dx || cur->dy)
+        map->timer = MAP_TIMER;
+}
+
+void update_diamond_speed(map_t *map, int y, int x)
+{
+    tile_t **mat = map->m[map->cur_m];
+    tile_t *cur = &(mat[y][x]);
+
+    cur->dx = 0;
+    cur->dy = 0;
+    if (mat[y+1][x].type == BLANK)
+        cur->dy = 1;
+    else if (test_falls(&(mat[y+1][x])) && !test_falls(&(mat[y-1][x])))
+    {
+        if (mat[y][x+1].type == BLANK && mat[y+1][x+1].type == BLANK &&
+            !mat[y][x+1].visited)
+            cur->dx = 1;
+        else if (mat[y][x-1].type == BLANK && mat[y-1][x-1].type == BLANK &&
+                 !mat[y][x-1].visited)
+            cur->dx = -1;
+    }
+
+    mat[y+cur->dy][x+cur->dx].visited = 1;
 
     if (cur->dx || cur->dy)
         map->timer = MAP_TIMER;
@@ -192,11 +229,12 @@ void update_boulder_speed(map_t *map, int y, int x)
 void update_tiles_speed(map_t *map, unsigned char *key)
 {
     tile_t **mat = map->m[map->cur_m];
-    update_player_speed(map, key);
 
-//    printf("%d %d\n", map->player_y, map->player_x);
-//    if (map->m[map->cur_m][map->player_y][map->player_x].dx)
-//        printf("%d\n", map->m[map->cur_m][map->player_y][map->player_x].dx);
+    for (int i = 1; i <= map->height; ++i)
+        for (int j = 1; j <= map->height; ++j)
+            mat[i][j].visited = 0;
+
+    update_player_speed(map, key);
 
     for (int i = 1; i <= map->height; ++i)
         for (int j = 1; j <= map->width; ++j)
@@ -205,6 +243,9 @@ void update_tiles_speed(map_t *map, unsigned char *key)
             {
                 case BOULDER:
                     update_boulder_speed(map, i, j);
+                    break;
+                case DIAMOND:
+                    update_diamond_speed(map, i, j);
                     break;
             }
         }
