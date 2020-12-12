@@ -3,10 +3,6 @@
 #include <allegro5/allegro_font.h>
 #include "states.h"
 
-/* E AGORA? fazer transição entre tiles e atualizar posição. Arquivos: states.c, map.c */
-
-enum {INITIALIZE, PLAY, END} state;
-
 int main()
 {
     state = INITIALIZE;
@@ -15,9 +11,10 @@ int main()
     {
         switch(state)
         {
-            case INITIALIZE: state_initialize(); state = PLAY; break;
-            case PLAY: state_play(); state = END; break;
-            case END: state_end(); break;
+            case INITIALIZE: state_initialize(); break;
+            case PLAY: state_play(); break;
+            case ENDGAME: state_endgame(); break;
+            case FINISH: state_finish(); break;
         }
     }
 }

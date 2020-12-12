@@ -3,6 +3,8 @@
 
 #define FRAMERATE 1.0/60.0
 
+enum {INITIALIZE, PLAY, ENDGAME, FINISH} state;
+
 #define BUFFER_WIDTH  360
 #define BUFFER_HEIGHT 240
 
@@ -17,6 +19,8 @@ void state_initialize();
 
 void state_play();
 
-void state_end();
+void state_endgame();
+
+void state_finish();
 
 #endif

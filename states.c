@@ -71,13 +71,16 @@ void state_initialize()
     initialize_sprites(&sprites);
     init_sprites(&sprites, &(game.map), disp);
 
+    state = PLAY;
 }
 
 void state_play()
 {
     unsigned char key[ALLEGRO_KEY_MAX];
     memset(key, 0, ALLEGRO_KEY_MAX);
-    
+
+    state = FINISH;
+
     // loop principal
     while(true)
     {
@@ -89,7 +92,14 @@ void state_play()
             case ALLEGRO_EVENT_TIMER:
                 if (!(game.map.timer))
                 {
-                    update_game(&game, key);
+                    if (game.lives)
+                        update_game(&game, key);
+                    else
+                    {
+                        end_game(&game);
+                        done = true;
+                        state = ENDGAME;
+                    }
                     for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
                         key[i] &= KEY_SEEN;
                 }
@@ -127,9 +137,35 @@ void state_play()
             redraw = false;
         }
     }
+
 }
 
-void state_end()
+void state_endgame()
+{
+    state = FINISH;
+    done = false;
+
+    while(game.map.timer > 0)
+    {
+        pre_draw(buffer);
+        draw_map(&sprites, &(game.map));
+        post_draw(buffer, disp);
+        game.map.timer--;
+    }
+
+    while (1)
+    {
+        al_wait_for_event(queue, &event);
+
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN)
+            done = true;
+        
+        if (done)
+            break;
+    }
+}
+
+void state_finish()
 {
     al_destroy_font(font);
     al_destroy_display(disp);

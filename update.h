@@ -5,4 +5,6 @@
 
 void update_game(game_t *game, unsigned char *key);
 
+void end_game(game_t *game);
+
 #endif

@@ -1,13 +1,14 @@
 #ifndef __MAP__
 #define __MAP__
  
-#define BORDER  '#'
-#define BLANK   ' '
-#define DIRT    '.'
-#define BOULDER 'O'
-#define WALL    '|'
-#define DIAMOND 'D'
-#define PLAYER  '@'
+#define BLANK     ' '
+#define BORDER    '#'
+#define BOULDER   'O'
+#define DIAMOND   'D'
+#define DIRT      '.'
+#define EXPLOSION '@'
+#define WALL      '|'
+#define PLAYER    '@'
 
 #define LEVELFILE "level_1.txt"
 #define MAP_TIMER 12
@@ -33,6 +34,8 @@ typedef struct map_s
 void initialize_map(map_t *map);
 
 void initialize_map_matrix(tile_t **m, int w, int h);
+
+void initialize_tile_explosion(tile_t *t);
 
 void read_map(map_t *map);
 

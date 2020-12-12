@@ -200,3 +200,24 @@ void update_game(game_t *game, unsigned char *key)
     if (test_player_died(&(game->map)))
         game->lives--;
 }
+
+void explode_player(map_t *map)
+{
+    tile_t **mat = map->m[(map->cur_m+1)%2];
+    int x = map->player_x;
+    int y = map->player_y;
+
+    for (int i = -1; i <= 1; ++i)
+        for (int j = -1; j <= 1; ++j)
+            if (mat[y + i][x + j].type != BORDER)
+                initialize_tile_explosion(&(mat[y + i][x + j]));
+    
+    map->timer = MAP_TIMER;    
+}
+
+void end_game(game_t *game)
+{
+    update_tiles_position(&(game->map));
+    explode_player(&(game->map));
+    flip_map_matrix(&(game->map));
+}

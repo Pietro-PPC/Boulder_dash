@@ -32,6 +32,14 @@ void initialize_tile_border(tile_t *t)
     t->visited = 0;
 }
 
+void initialize_tile_explosion(tile_t *t)
+{
+    t->dx = 0; 
+    t->dy = 0;
+    t->type = EXPLOSION;
+    t->visited = 0;
+}
+
 void initialize_map_matrix(tile_t **m, int w, int h)
 {
     for (int i = 0; i < h+2; ++i)
