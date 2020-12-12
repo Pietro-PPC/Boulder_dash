@@ -89,10 +89,7 @@ void state_play()
             case ALLEGRO_EVENT_TIMER:
                 if (!(game.map.timer))
                 {
-                    if (game.lives)
-                        update_map(&(game.map), key);
-                    else
-                        done = true;
+                    update_game(&game, key);
                     for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
                         key[i] &= KEY_SEEN;
                 }

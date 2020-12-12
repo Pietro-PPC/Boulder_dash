@@ -1,6 +1,7 @@
 #include <allegro5/allegro.h>
 #include <stdio.h>
 #include "map.h"
+#include "game.h"
 
 void update_player_speed(map_t *map, unsigned char *key)
 {
@@ -56,11 +57,12 @@ void update_boulder_speed(map_t *map, int y, int x)
 {
     tile_t **mat = map->m[map->cur_m];
     tile_t *cur = &(mat[y][x]);
+    int prev_dy = cur->dy;
 
     cur->dx = 0;
     cur->dy = 0;
 
-    if (mat[y+1][x].type == BLANK)
+    if (mat[y+1][x].type == BLANK || (mat[y+1][x].type == PLAYER && prev_dy > 0))
         cur->dy = 1;
     else if (mat[y][x-1].type == PLAYER && mat[y][x-1].dx == 1 &&
             !mat[y][x+1].visited)
@@ -88,10 +90,11 @@ void update_diamond_speed(map_t *map, int y, int x)
 {
     tile_t **mat = map->m[map->cur_m];
     tile_t *cur = &(mat[y][x]);
+    int prev_dy = cur->dy;
 
     cur->dx = 0;
     cur->dy = 0;
-    if (mat[y+1][x].type == BLANK)
+    if (mat[y+1][x].type == BLANK || (mat[y+1][x].type == PLAYER && prev_dy > 0))
         cur->dy = 1;
     else if (test_falls(&(mat[y+1][x])) && !test_falls(&(mat[y-1][x])))
     {
@@ -181,9 +184,19 @@ void flip_map_matrix(map_t *map)
     map->cur_m = (map->cur_m + 1) % 2;
 }
 
-void update_map(map_t *map, unsigned char *key)
+int test_player_died(map_t *map)
 {
-    update_tiles_position(map);
-    flip_map_matrix(map);
-    update_tiles_speed(map, key);
+    tile_t **mat = map->m[map->cur_m];
+    int py = map->player_y;
+    int px = map->player_x;
+    return (!mat[py][px].dx && mat[py][px].dy != 1 && mat[py-1][px].dy == 1);
+}
+
+void update_game(game_t *game, unsigned char *key)
+{
+    update_tiles_position(&(game->map));
+    flip_map_matrix(&(game->map));
+    update_tiles_speed(&(game->map), key);
+    if (test_player_died(&(game->map)))
+        game->lives--;
 }

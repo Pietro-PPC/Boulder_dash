@@ -22,7 +22,7 @@ error_msg.o: error_msg.c error_msg.h
 draw.o: draw.c draw.h map.h map.c sprites.h sprites.c states.h states.c
 	gcc -c draw.c $(CFLAGS)
 
-update.o: update.c update.h map.c map.h
+update.o: update.c update.h map.c map.h game.c game.h
 	gcc -c update.c $(CFLAGS)
 
 game.o: game.c game.h map.c map.h
