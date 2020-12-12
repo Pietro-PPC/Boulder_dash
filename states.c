@@ -7,6 +7,7 @@
 #include "sprites.h"
 #include "draw.h"
 #include "update.h"
+#include "game.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
@@ -15,7 +16,7 @@ ALLEGRO_FONT* font;
 ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_EVENT event;
 
-map_t map;
+game_t game;
 sprites_t sprites;
 
 bool redraw = true;
@@ -60,27 +61,17 @@ void state_initialize()
     // inicializa variáveis de controle
     al_start_timer(timer);
 
+    // inicializa jogo
+    initialize_game(&game);
+
     // le mapa do jogo
-    initialize_map(&map);
-    read_map(&map);
+    read_map(&(game.map));
 
     // inicializa sprites
     initialize_sprites(&sprites);
-    init_sprites(&sprites, &map, disp);
+    init_sprites(&sprites, &(game.map), disp);
 
 }
-/*
-void print_map(map_t *map)
-{
-    for (int i = 0; i < map->height; ++i)
-    {
-        for (int j = 0; j < map->width; ++j)
-        {
-            printf("%c", map->m[i][j].type);
-        }
-        printf("\n");
-    }
-}*/
 
 void state_play()
 {
@@ -88,7 +79,6 @@ void state_play()
     memset(key, 0, ALLEGRO_KEY_MAX);
     
     // loop principal
-    //print_map(&map);
     while(true)
     {
         al_wait_for_event(queue, &event);
@@ -97,15 +87,18 @@ void state_play()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-                if (!(map.timer))
+                if (!(game.map.timer))
                 {
-                    update_map(&map, key);
+                    if (game.lives)
+                        update_map(&(game.map), key);
+                    else
+                        done = true;
                     for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
                         key[i] &= KEY_SEEN;
                 }
                 else
                     //transition(map->timer);
-                    map.timer--;
+                    game.map.timer--;
                 
                 redraw = true;
                 break;
@@ -132,7 +125,7 @@ void state_play()
         if (redraw)
         {
             pre_draw(buffer);
-            draw_map(&sprites, &map);
+            draw_map(&sprites, &(game.map));
             post_draw(buffer, disp);
             redraw = false;
         }
@@ -149,7 +142,7 @@ void state_end()
 
     destroy_sprites(&sprites);
 
-    destroy_map(&map);
+    destroy_map(&(game.map));
     
     al_shutdown_image_addon();
 
