@@ -23,6 +23,7 @@ void initialize_tile_blank(tile_t *t)
     t->dy = 0;
     t->type = BLANK;
     t->visited = 0;
+    t->disappear = 0;
 }
 void initialize_tile_border(tile_t *t)
 {
@@ -30,6 +31,7 @@ void initialize_tile_border(tile_t *t)
     t->dy = 0;
     t->type = BORDER;
     t->visited = 0;
+    t->disappear = 0;
 }
 
 void initialize_tile_explosion(tile_t *t)
@@ -38,6 +40,7 @@ void initialize_tile_explosion(tile_t *t)
     t->dy = 0;
     t->type = EXPLOSION;
     t->visited = 0;
+    t->disappear = 0;
 }
 
 void initialize_map_matrix(tile_t **m, int w, int h)

@@ -20,10 +20,27 @@ void initialize_sprites(sprites_t *sprites)
     sprites->blank = NULL;
     sprites->dirt = NULL;
     sprites->border = NULL;
-    sprites->boulder = NULL;
-    sprites->diamond = NULL;
-    sprites->player = NULL;
     sprites->wall = NULL;
+    for (int i = 0; i < N_TRANSITION; ++i)
+        sprites->explosion.explosion[i] = NULL;
+
+    sprites->boulder.stop = NULL;
+    for (int i = 0; i < N_TRANSITION; ++i)
+        sprites->boulder.roll[i] = NULL;
+
+    sprites->diamond.stop = NULL;
+    for(int i = 0; i < N_TRANSITION; ++i)
+    {
+        sprites->diamond.fall[i] = NULL;
+        sprites->diamond.disappear[i] = NULL;
+    }
+
+    sprites->player.stop = NULL;
+    for (int i = 0; i < N_TRANSITION; ++i)
+    {
+        sprites->player.run_left[i] = NULL;
+        sprites->player.run_right[i] = NULL;
+    }
 
     sprites->background = NULL;
 }
@@ -37,10 +54,45 @@ void init_background(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 
     for (int i = 0; i < map->height; ++i)
         for (int j = 0; j < map->width; ++j)
-        {
             al_draw_bitmap(sprites->blank, j*TILE_S, i*TILE_S, 0);
-        }
+
     al_set_target_backbuffer(disp);
+}
+
+void init_player_sprites(sprites_t *sprites)
+{
+    sprites->player.stop = get_sprite(sprites->sheet[0], 24, 144, TILE_S, TILE_S);
+    for(int i = 0; i < N_TRANSITION; ++i)
+    {
+        sprites->player.run_right[i] = get_sprite(sprites->sheet[0], 72 + TILE_S*i, 156, TILE_S, TILE_S);
+        sprites->player.run_left[i] = get_sprite(sprites->sheet[0], 60 - TILE_S*i, 156, TILE_S, TILE_S);
+    }
+}
+
+void init_diamond_sprites(sprites_t *sprites)
+{
+    sprites->diamond.stop = get_sprite(sprites->sheet[0], 36, 144, TILE_S, TILE_S);
+    sprites->diamond.fall[0] = get_sprite(sprites->sheet[0], 36, 144, TILE_S, TILE_S);
+    sprites->diamond.disappear[0] = get_sprite(sprites->sheet[0], 36, 144, TILE_S, TILE_S);
+    for (int i = 1; i < N_TRANSITION; ++i)
+    {
+        sprites->diamond.fall[i] = get_sprite(sprites->sheet[0], 36 + i*TILE_S, 144, TILE_S, TILE_S);
+        sprites->diamond.disappear[i] = get_sprite(sprites->sheet[0], 0 + (i-1)*TILE_S, 192, TILE_S, TILE_S);
+    }
+}
+
+void init_boulder_sprites(sprites_t *sprites)
+{
+    sprites->boulder.stop = get_sprite(sprites->sheet[0], 0, 204, TILE_S, TILE_S);
+    sprites->boulder.roll[0] = get_sprite(sprites->sheet[0], 0, 204, TILE_S, TILE_S);
+    for (int i = 1; i < N_TRANSITION; ++i)
+        sprites->boulder.roll[i] = get_sprite(sprites->sheet[0], 0 + i*TILE_S, 204, TILE_S, TILE_S);
+}
+
+void init_explosion_sprites(sprites_t *sprites)
+{
+    for (int i = 0; i < N_TRANSITION; ++i)
+        sprites->explosion.explosion[i] = get_sprite(sprites->sheet[0], i*TILE_S, 180, TILE_S, TILE_S);
 }
 
 void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
@@ -53,10 +105,12 @@ void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 
     sprites->wall = get_sprite(sprites->sheet[0], 84, 0, TILE_S, TILE_S);
     sprites->dirt = get_sprite(sprites->sheet[0], 12, 12, TILE_S, TILE_S);
-    sprites->boulder = get_sprite(sprites->sheet[0], 0, 204, TILE_S, TILE_S);
-    sprites->diamond = get_sprite(sprites->sheet[0], 36, 144, TILE_S, TILE_S);
     sprites->border = get_sprite(sprites->sheet[0], 228, 36, TILE_S, TILE_S);
-    sprites->player = get_sprite(sprites->sheet[0], 24, 144, TILE_S, TILE_S);
+    
+    init_explosion_sprites(sprites);
+    init_boulder_sprites(sprites);
+    init_diamond_sprites(sprites);
+    init_player_sprites(sprites);
     
     sprites->blank = get_sprite(sprites->sheet[1], 0, 0, TILE_S, TILE_S);
     
@@ -70,9 +124,28 @@ void destroy_sprites(sprites_t *sprites)
     al_destroy_bitmap(sprites->border);
     al_destroy_bitmap(sprites->background);
     al_destroy_bitmap(sprites->blank);
-    al_destroy_bitmap(sprites->boulder);
-    al_destroy_bitmap(sprites->diamond);
     al_destroy_bitmap(sprites->dirt);
-    al_destroy_bitmap(sprites->player);
+
+    for (int i = 0; i < N_TRANSITION; ++i)
+        al_destroy_bitmap(sprites->explosion.explosion[i]);
+
+    al_destroy_bitmap(sprites->boulder.stop);
+    for (int i = 0; i < N_TRANSITION; ++i)
+        al_destroy_bitmap(sprites->boulder.roll[i]);
+
+    al_destroy_bitmap(sprites->diamond.stop);
+    for (int i = 0; i < N_TRANSITION; ++i)
+    {
+        al_destroy_bitmap(sprites->diamond.disappear[i]);
+        al_destroy_bitmap(sprites->diamond.fall[i]);
+    }
+
+    al_destroy_bitmap(sprites->player.stop);
+    for (int i = 0; i < N_TRANSITION; ++i)
+    {
+        al_destroy_bitmap(sprites->player.run_left[i]);
+        al_destroy_bitmap(sprites->player.run_right[i]);
+    }
+    
     al_destroy_bitmap(sprites->wall);
 }

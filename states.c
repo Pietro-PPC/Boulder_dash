@@ -19,9 +19,6 @@ ALLEGRO_EVENT event;
 game_t game;
 sprites_t sprites;
 
-bool redraw = true;
-bool done = false;
-
 void state_initialize()
 // Inicializa todas as variáveis e structs necessárias para o jogo
 {
@@ -78,6 +75,8 @@ void state_play()
 {
     unsigned char key[ALLEGRO_KEY_MAX];
     memset(key, 0, ALLEGRO_KEY_MAX);
+    bool redraw = true;
+    bool done = false;
 
     state = FINISH;
 
@@ -104,7 +103,6 @@ void state_play()
                         key[i] &= KEY_SEEN;
                 }
                 else
-                    //transition(map->timer);
                     game.map.timer--;
                 
                 redraw = true;
@@ -137,13 +135,12 @@ void state_play()
             redraw = false;
         }
     }
-
 }
 
 void state_endgame()
 {
     state = FINISH;
-    done = false;
+    bool done = false;
 
     while(game.map.timer > 0)
     {
@@ -157,7 +154,7 @@ void state_endgame()
     {
         al_wait_for_event(queue, &event);
 
-        if (event.type == ALLEGRO_EVENT_KEY_DOWN)
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             done = true;
         
         if (done)

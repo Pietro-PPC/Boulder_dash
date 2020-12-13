@@ -3,6 +3,13 @@
 #include "map.h"
 #include "game.h"
 
+int test_falls(tile_t *t)
+{
+    char c = t->type;
+    return (c == DIAMOND ||
+            c == BOULDER);
+}
+
 void update_player_speed(map_t *map, unsigned char *key)
 {
     tile_t **mat = map->m[map->cur_m];
@@ -17,14 +24,14 @@ void update_player_speed(map_t *map, unsigned char *key)
     {
         if ((test_walkable(&(mat[y][x-1])) ||
             (mat[y][x-1].type == BOULDER && mat[y][x-2].type == BLANK)) &&
-            !mat[y][x-1].visited)
+            !( test_falls(&(mat[y-1][x-1])) && mat[y][x-1].type == BLANK))
             cur->dx = -1;
     }
     else if (key[ALLEGRO_KEY_RIGHT] && x < map->width)
     {
         if ((test_walkable(&(mat[y][x+1])) ||
             (mat[y][x+1].type == BOULDER && mat[y][x+2].type == BLANK)) &&
-            !mat[y][x+1].visited)
+            !( test_falls(&(mat[y-1][x+1])) && mat[y][x+1].type == BLANK ))
             cur->dx = 1;
     }
     else if (key[ALLEGRO_KEY_UP] && y > 1)
@@ -46,13 +53,6 @@ void update_player_speed(map_t *map, unsigned char *key)
         map->timer = MAP_TIMER;
 }
 
-int test_falls(tile_t *t)
-{
-    char c = t->type;
-    return (c == DIAMOND ||
-            c == BOULDER);
-}
-
 void update_boulder_speed(map_t *map, int y, int x)
 {
     tile_t **mat = map->m[map->cur_m];
@@ -70,7 +70,7 @@ void update_boulder_speed(map_t *map, int y, int x)
     else if (mat[y][x+1].type == PLAYER && mat[y][x+1].dx == -1 &&
             !mat[y][x-1].visited)
         cur->dx = -1;
-    else if (test_falls(&(mat[y+1][x])) && !test_falls(&(mat[y-1][x])) )
+    else if (test_falls(&(mat[y+1][x])) && !(test_falls(&(mat[y-1][x])) && mat[y-1][x].dx))
     {
         if (mat[y][x-1].type == BLANK && mat[y+1][x-1].type == BLANK &&
             !mat[y][x-1].visited)
@@ -192,11 +192,40 @@ int test_player_died(map_t *map)
     return (!mat[py][px].dx && mat[py][px].dy != 1 && mat[py-1][px].dy == 1);
 }
 
+int disappears(tile_t *t)
+{
+    char c = t->type;
+    return (c == DIAMOND ||
+            c == DIRT);
+}
+
+void reset_disappear_state(map_t *map)
+{
+    for (int i = 1; i <= map->height; ++i)
+        for (int j = 1; j <= map->width; ++j)
+            map->m[map->cur_m][i][j].disappear = 0;
+}
+
+void update_disappear_state(map_t *map)
+{
+    tile_t **mat = map->m[map->cur_m];
+    int px = map->player_x;
+    int py = map->player_y;
+    int dx = mat[py][px].dx;
+    int dy = mat[py][px].dy;
+
+    if ((dx || dy) && disappears(&(mat[py+dy][px+dx])) && !mat[py+dy][px+dx].dy)
+        mat[py+dy][px+dx].disappear = 1;
+}
+
 void update_game(game_t *game, unsigned char *key)
 {
     update_tiles_position(&(game->map));
     flip_map_matrix(&(game->map));
+
+    reset_disappear_state(&(game->map));
     update_tiles_speed(&(game->map), key);
+    update_disappear_state(&(game->map));
     if (test_player_died(&(game->map)))
         game->lives--;
 }

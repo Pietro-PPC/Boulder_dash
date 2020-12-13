@@ -6,7 +6,7 @@
 #define BOULDER   'O'
 #define DIAMOND   'D'
 #define DIRT      '.'
-#define EXPLOSION '@'
+#define EXPLOSION 'X'
 #define WALL      '|'
 #define PLAYER    '@'
 
@@ -18,6 +18,7 @@ typedef struct tile_s
     int dx, dy;
     char type;
     int visited;
+    int disappear;
 } tile_t;
 
 typedef struct map_s
