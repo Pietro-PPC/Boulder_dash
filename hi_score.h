@@ -11,7 +11,7 @@ typedef struct scores_s
     int size;
 } scores_t;
 
-void print_hi_scores(scores_t *scores);
+void save_hi_scores(scores_t *scores);
 
 void get_hi_scores(scores_t *scores);
 

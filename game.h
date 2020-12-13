@@ -23,6 +23,7 @@ typedef struct game_s
     int time;
     int frame;
     int diamonds_got;
+    int endgame;
 } game_t;
 
 void initialize_samples(samples_t *s);

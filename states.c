@@ -80,13 +80,9 @@ void state_initialize()
     initialize_sprites(&sprites);
     init_sprites(&sprites, &(game.map), disp);
 
-    state = PLAY;
-
     get_hi_scores(&scores);
-    print_hi_scores(&scores);
-    printf("\n");
-    insert_score(&scores, "PIE", 50);
-    print_hi_scores(&scores);
+
+    state = PLAY;
 }
 
 void state_play()
@@ -113,16 +109,19 @@ void state_play()
                 
                 if (!(game.map.timer))
                 {
-                    if (game.lives)
+                    if (game.lives && !game.endgame)
                     {
                         update_game(&game, key);
                         play_instant_samples(&audio, &game);
                     }
-                    else
+                    else 
                     {
-                        end_game(&game);
-                        game.n_plays.explosion = 1;
-                        play_audio(audio.explosion, &(game.n_plays.explosion));
+                        if (!game.lives)
+                        {
+                            end_game(&game);
+                            game.n_plays.explosion = 1;
+                            play_audio(audio.explosion, &(game.n_plays.explosion));
+                        }
                         done = true;
                         state = ENDGAME;
                     }
@@ -180,6 +179,9 @@ void state_endgame()
         post_draw(buffer, disp);
         game.map.timer--;
     }
+
+    insert_score(&scores, "???", game.score);
+    save_hi_scores(&scores);
 
     while (1)
     {

@@ -22,4 +22,5 @@ void initialize_game(game_t *game)
     game->diamonds_got = 0;
     game->time = 180;
     game->frame = 0;
+    game->endgame = 0;
 }

@@ -58,6 +58,7 @@ void update_player_speed(game_t *game, unsigned char *key)
     if (mat[y+cur->dy][x+cur->dx].type == EXIT)
     {
         game->n_plays.victory = 1;
+        game->endgame = 1;
         game->score += game->time;
     }
     if (mat[y+cur->dy][x+cur->dx].type == FAKE_WALL)
