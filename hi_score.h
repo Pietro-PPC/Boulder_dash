@@ -6,13 +6,15 @@
 
 typedef struct scores_s
 {
-    char name[SCORE_NUM][4];
-    int score[SCORE_NUM];
+    char name[SCORE_NUM+1][4];
+    int score[SCORE_NUM+1];
     int size;
 } scores_t;
 
 void print_hi_scores(scores_t *scores);
 
 void get_hi_scores(scores_t *scores);
+
+void insert_score(scores_t *scores, char *name, int score);
 
 #endif

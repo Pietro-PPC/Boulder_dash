@@ -84,6 +84,9 @@ void state_initialize()
 
     get_hi_scores(&scores);
     print_hi_scores(&scores);
+    printf("\n");
+    insert_score(&scores, "PIE", 50);
+    print_hi_scores(&scores);
 }
 
 void state_play()
