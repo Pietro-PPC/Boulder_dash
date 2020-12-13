@@ -8,10 +8,11 @@
 #define DIRT      '.'
 #define EXIT      'E'
 #define EXPLOSION 'X'
-#define WALL      '|'
+#define FAKE_WALL 'F'
 #define PLAYER    '@'
+#define WALL      '|'
 
-#define DIAMOND_WIN 2
+#define DIAMOND_WIN 12
 
 #define LEVELFILE "level_1.txt"
 #define MAP_TIMER 12

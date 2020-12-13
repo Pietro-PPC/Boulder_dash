@@ -24,26 +24,30 @@ void update_player_speed(map_t *map, unsigned char *key)
     if (key[ALLEGRO_KEY_LEFT] && x > 1)
     {
         if ((test_walkable(&(mat[y][x-1])) ||
-            (mat[y][x-1].type == BOULDER && mat[y][x-2].type == BLANK)) &&
-            !( test_falls(&(mat[y-1][x-1])) && mat[y][x-1].type == BLANK))
+            (mat[y][x-1].type == BOULDER && mat[y][x-2].type == BLANK) ||
+            (mat[y][x-1].type == EXIT && map->open_exit)) &&
+            !( test_falls(&(mat[y-1][x-1])) && mat[y][x-1].type == BLANK) )
             cur->dx = -1;
     }
     else if (key[ALLEGRO_KEY_RIGHT] && x < map->width)
     {
         if ((test_walkable(&(mat[y][x+1])) ||
-            (mat[y][x+1].type == BOULDER && mat[y][x+2].type == BLANK)) &&
+            (mat[y][x+1].type == BOULDER && mat[y][x+2].type == BLANK) ||
+            (mat[y][x+1].type == EXIT && map->open_exit)) &&
             !( test_falls(&(mat[y-1][x+1])) && mat[y][x+1].type == BLANK ))
             cur->dx = 1;
     }
     else if (key[ALLEGRO_KEY_UP] && y > 1)
     {
-        if (test_walkable(&(mat[y-1][x])) && 
+        if ((test_walkable(&(mat[y-1][x])) ||
+            (mat[y-1][x].type == EXIT && map->open_exit)) && 
             !mat[y-1][x].visited)
             cur->dy = -1;
     }
     else if (key[ALLEGRO_KEY_DOWN] && y < map->height)
     {
-        if (test_walkable(&(mat[y+1][x])) && 
+        if ((test_walkable(&(mat[y+1][x])) ||
+            (mat[y+1][x].type == EXIT && map->open_exit)) && 
             !mat[y+1][x].visited)
             cur->dy = 1;
     }
@@ -197,7 +201,8 @@ int disappears(tile_t *t)
 {
     char c = t->type;
     return (c == DIAMOND ||
-            c == DIRT);
+            c == DIRT ||
+            c == FAKE_WALL);
 }
 
 void reset_disappear_state(map_t *map)

@@ -118,7 +118,8 @@ int test_walkable(tile_t *t)
     char c = t->type;
     return !(c == BOULDER ||
              c == WALL ||
-             c == BORDER);
+             c == BORDER ||
+             c == EXIT);
 }
 
 int test_solid(tile_t *t)

@@ -77,6 +77,10 @@ void draw_tile(tile_t *t, game_t *game, int x, int y, sprites_t *sprites)
             else
                 al_draw_bitmap(sprites->exit.closed, x, y, 0);
             break;
+        case FAKE_WALL:
+            if (!t->disappear)
+                al_draw_bitmap(sprites->wall, x, y, 0);
+            break;
     }
 }
 
