@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "map.h"
 #include "game.h"
+#include "update.h"
 
 int test_falls(tile_t *t)
 {
@@ -70,7 +71,7 @@ void update_boulder_speed(map_t *map, int y, int x)
     else if (mat[y][x+1].type == PLAYER && mat[y][x+1].dx == -1 &&
             !mat[y][x-1].visited)
         cur->dx = -1;
-    else if (test_falls(&(mat[y+1][x])) && !(test_falls(&(mat[y-1][x])) && mat[y-1][x].dx))
+    else if (test_falls(&(mat[y+1][x])) && !(test_falls(&(mat[y-1][x]))))
     {
         if (mat[y][x-1].type == BLANK && mat[y+1][x-1].type == BLANK &&
             !mat[y][x-1].visited)
@@ -101,7 +102,7 @@ void update_diamond_speed(map_t *map, int y, int x)
         if (mat[y][x+1].type == BLANK && mat[y+1][x+1].type == BLANK &&
             !mat[y][x+1].visited)
             cur->dx = 1;
-        else if (mat[y][x-1].type == BLANK && mat[y-1][x-1].type == BLANK &&
+        else if (mat[y][x-1].type == BLANK && mat[y+1][x-1].type == BLANK &&
                  !mat[y][x-1].visited)
             cur->dx = -1;
     }
@@ -206,16 +207,22 @@ void reset_disappear_state(map_t *map)
             map->m[map->cur_m][i][j].disappear = 0;
 }
 
-void update_disappear_state(map_t *map)
+void update_disappear_state(game_t *game)
 {
-    tile_t **mat = map->m[map->cur_m];
-    int px = map->player_x;
-    int py = map->player_y;
+    tile_t **mat = game->map.m[game->map.cur_m];
+    int px = game->map.player_x;
+    int py = game->map.player_y;
     int dx = mat[py][px].dx;
     int dy = mat[py][px].dy;
 
-    if ((dx || dy) && disappears(&(mat[py+dy][px+dx])) && !mat[py+dy][px+dx].dy)
-        mat[py+dy][px+dx].disappear = 1;
+    tile_t* t = &(mat[py+dy][px+dx]);
+
+    if ((dx || dy) && disappears(t) && !(t->dy))
+    {
+        if (t->type == DIAMOND)
+            game->diamonds_got++;
+        t->disappear = 1;
+    }
 }
 
 void update_game(game_t *game, unsigned char *key)
@@ -225,7 +232,10 @@ void update_game(game_t *game, unsigned char *key)
 
     reset_disappear_state(&(game->map));
     update_tiles_speed(&(game->map), key);
-    update_disappear_state(&(game->map));
+    update_disappear_state(game);
+    
+    if (game->diamonds_got >= DIAMOND_WIN)
+        game->map.open_exit = 1;
     if (test_player_died(&(game->map)))
         game->lives--;
 }
@@ -239,7 +249,7 @@ void explode_player(map_t *map)
     for (int i = -1; i <= 1; ++i)
         for (int j = -1; j <= 1; ++j)
             if (mat[y + i][x + j].type != BORDER)
-                initialize_tile_explosion(&(mat[y + i][x + j]));
+                initialize_tile(&(mat[y + i][x + j]), EXPLOSION);
     
     map->timer = MAP_TIMER;    
 }

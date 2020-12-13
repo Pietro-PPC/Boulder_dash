@@ -13,32 +13,17 @@ void initialize_map(map_t *map)
     map->height = 0;
     map->timer = 0;
     map->cur_m = 0;
+    map->diamond_n = 0;
+    map->open_exit = 0;
     map->m[0] = NULL;
     map->m[1] = NULL;
 }
 
-void initialize_tile_blank(tile_t *t)
+void initialize_tile(tile_t *t, char type)
 {
     t->dx = 0;
     t->dy = 0;
-    t->type = BLANK;
-    t->visited = 0;
-    t->disappear = 0;
-}
-void initialize_tile_border(tile_t *t)
-{
-    t->dx = 0;
-    t->dy = 0;
-    t->type = BORDER;
-    t->visited = 0;
-    t->disappear = 0;
-}
-
-void initialize_tile_explosion(tile_t *t)
-{
-    t->dx = 0; 
-    t->dy = 0;
-    t->type = EXPLOSION;
+    t->type = type;
     t->visited = 0;
     t->disappear = 0;
 }
@@ -48,9 +33,9 @@ void initialize_map_matrix(tile_t **m, int w, int h)
     for (int i = 0; i < h+2; ++i)
         for (int j = 0; j < w+2; ++j)
             if (i == 0 || i > h || j == 0 || j > w)
-                initialize_tile_border(&(m[i][j]));
+                initialize_tile(&(m[i][j]), BORDER);
             else
-                initialize_tile_blank(&(m[i][j]));
+                initialize_tile(&(m[i][j]), BLANK);
 }
 
 void allocate_map(tile_t ***map, int w, int h)
@@ -71,7 +56,6 @@ void allocate_map(tile_t ***map, int w, int h)
 }
 
 void read_map(map_t *map)
-/* ATUALIZAR: lidar com mais de um player ou 0 players no campo */
 {
     FILE *f;
     char filename[101] = "levelmaps/";
@@ -96,21 +80,37 @@ void read_map(map_t *map)
     initialize_map_matrix(map->m[0], map->width, map->height);
     initialize_map_matrix(map->m[1], map->width, map->height);
 
+    map->player_y = 0;
+    map->player_x = 0;
+
     tile_t **initMap = map->m[map->cur_m];
     for (int i = 1; i <= map->height && !feof(f); ++i)
     {
         for (int j = 1; j <= map->width; ++j)
         {
             initMap[i][j].type = getc(f);
-            if (initMap[i][j].type == PLAYER)
+            switch (initMap[i][j].type)
             {
-                map->player_y = i;
-                map->player_x = j;
+                case PLAYER:
+                    if (map->player_y || map->player_x)
+                        fatal_error("Sem suporte para mais de um jogador!");
+                    map->player_y = i;
+                    map->player_x = j;
+                    break;
+                case DIAMOND:
+                    map->diamond_n++;
+                    break;
             }
         }
         // itera para proxima linha ou fim de arquivo
         while(getc(f) != '\n' && !feof(f));
     }
+
+    if (!map->player_x || !map->player_y)
+        fatal_error("Mapa não tem jogador!");
+    if (map->diamond_n < DIAMOND_WIN)
+        fatal_error("Mapa sem diamantes suficientes!");
+    
 }
 
 int test_walkable(tile_t *t)

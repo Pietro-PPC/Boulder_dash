@@ -89,6 +89,9 @@ void state_play()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
+                game.frame = (game.frame + 1) % 60;
+                if (!game.frame)
+                    --game.time;
                 if (!(game.map.timer))
                 {
                     if (game.lives)
@@ -130,7 +133,7 @@ void state_play()
         if (redraw)
         {
             pre_draw(buffer);
-            draw_map(&sprites, &(game.map));
+            draw_map(&sprites, &(game));
             post_draw(buffer, disp);
             redraw = false;
         }
@@ -145,7 +148,7 @@ void state_endgame()
     while(game.map.timer > 0)
     {
         pre_draw(buffer);
-        draw_map(&sprites, &(game.map));
+        draw_map(&sprites, &(game));
         post_draw(buffer, disp);
         game.map.timer--;
     }

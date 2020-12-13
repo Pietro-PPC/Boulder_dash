@@ -9,6 +9,8 @@ typedef struct game_s
     int lives;
     int score;
     int time;
+    int frame;
+    int diamonds_got;
 } game_t;
 
 void initialize_game(game_t *game);

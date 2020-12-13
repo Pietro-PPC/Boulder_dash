@@ -21,6 +21,11 @@ void initialize_sprites(sprites_t *sprites)
     sprites->dirt = NULL;
     sprites->border = NULL;
     sprites->wall = NULL;
+
+    sprites->exit.closed = NULL;
+    for (int i = 0; i < N_TRANSITION; ++i)
+        sprites->exit.open[i] = NULL;
+
     for (int i = 0; i < N_TRANSITION; ++i)
         sprites->explosion.explosion[i] = NULL;
 
@@ -95,6 +100,13 @@ void init_explosion_sprites(sprites_t *sprites)
         sprites->explosion.explosion[i] = get_sprite(sprites->sheet[0], i*TILE_S, 180, TILE_S, TILE_S);
 }
 
+void init_exit_sprites(sprites_t *sprites)
+{
+    sprites->exit.closed = get_sprite(sprites->sheet[0], 108, 144, TILE_S, TILE_S);
+    for (int i = 0; i < N_TRANSITION; ++i)
+        sprites->exit.open[i] = get_sprite(sprites->sheet[0], 120 + i*TILE_S, 144, TILE_S, TILE_S);
+}
+
 void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 {
     sprites->sheet[0] = al_load_bitmap("sprites/tileset.png");
@@ -106,13 +118,13 @@ void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
     sprites->wall = get_sprite(sprites->sheet[0], 84, 0, TILE_S, TILE_S);
     sprites->dirt = get_sprite(sprites->sheet[0], 12, 12, TILE_S, TILE_S);
     sprites->border = get_sprite(sprites->sheet[0], 228, 36, TILE_S, TILE_S);
+    sprites->blank = get_sprite(sprites->sheet[1], 0, 0, TILE_S, TILE_S);
     
+    init_exit_sprites(sprites);
     init_explosion_sprites(sprites);
     init_boulder_sprites(sprites);
     init_diamond_sprites(sprites);
     init_player_sprites(sprites);
-    
-    sprites->blank = get_sprite(sprites->sheet[1], 0, 0, TILE_S, TILE_S);
     
     init_background(sprites, map, disp);
 }
@@ -125,6 +137,10 @@ void destroy_sprites(sprites_t *sprites)
     al_destroy_bitmap(sprites->background);
     al_destroy_bitmap(sprites->blank);
     al_destroy_bitmap(sprites->dirt);
+
+    al_destroy_bitmap(sprites->exit.closed);
+    for (int i = 0; i < N_TRANSITION; ++i)
+        al_destroy_bitmap(sprites->exit.open[i]);
 
     for (int i = 0; i < N_TRANSITION; ++i)
         al_destroy_bitmap(sprites->explosion.explosion[i]);

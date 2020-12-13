@@ -7,7 +7,6 @@
 
 #define TILE_S 12
 #define N_TRANSITION 6
-#define N_TRANSITION_BOULDER 10
 
 typedef struct player_bitmaps_s
 {
@@ -34,6 +33,12 @@ typedef struct explosion_bitmaps_s
     ALLEGRO_BITMAP *explosion[N_TRANSITION];
 } explosion_bitmaps_t;
 
+typedef struct exit_bitmaps_s
+{
+    ALLEGRO_BITMAP *closed;
+    ALLEGRO_BITMAP *open[N_TRANSITION];
+} exit_bitmaps_t;
+
 typedef struct sprites_s
 {
     ALLEGRO_BITMAP *sheet[2];
@@ -43,6 +48,7 @@ typedef struct sprites_s
     ALLEGRO_BITMAP *blank;
     ALLEGRO_BITMAP *border;
 
+    exit_bitmaps_t exit;
     explosion_bitmaps_t explosion;
     boulder_bitmaps_t boulder;
     diamond_bitmaps_t diamond;
