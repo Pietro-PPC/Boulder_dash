@@ -64,7 +64,7 @@ void read_map(map_t *map)
     // Abre arquivo do nível
     f = fopen(filename, "r");
     if (!f)
-        fatal_error("Falha ao abrir mapa");
+        fatal_error("Falha ao abrir arquivo de mapa");
 
     // lê linha com largura e altura e pula para a próxima linha
     fscanf(f, "%d %d", &(map->width), &(map->height));
@@ -111,6 +111,7 @@ void read_map(map_t *map)
     if (map->diamond_n < DIAMOND_WIN)
         fatal_error("Mapa sem diamantes suficientes!");
     
+    fclose(f);
 }
 
 int test_walkable(tile_t *t)

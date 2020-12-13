@@ -9,6 +9,7 @@
 #include "update.h"
 #include "game.h"
 #include "audio.h"
+#include "hi_score.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
@@ -17,6 +18,7 @@ ALLEGRO_FONT* font;
 ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_EVENT event;
 
+scores_t scores;
 game_t game;
 audio_t audio;
 sprites_t sprites;
@@ -79,6 +81,9 @@ void state_initialize()
     init_sprites(&sprites, &(game.map), disp);
 
     state = PLAY;
+
+    get_hi_scores(&scores);
+    print_hi_scores(&scores);
 }
 
 void state_play()
