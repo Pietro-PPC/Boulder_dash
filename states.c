@@ -8,6 +8,7 @@
 #include "draw.h"
 #include "update.h"
 #include "game.h"
+#include "audio.h"
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_DISPLAY* disp;
@@ -17,6 +18,7 @@ ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_EVENT event;
 
 game_t game;
+audio_t audio;
 sprites_t sprites;
 
 void state_initialize()
@@ -30,6 +32,14 @@ void state_initialize()
 
     // inicializa addon de imagens
     test_init(al_init_image_addon(), "addon de imagem");
+
+    // funções de inicialização do audio
+    test_init(al_install_audio(), "audio");
+    test_init(al_init_acodec_addon(), "audio codecs");
+    test_init(al_reserve_samples(16), "reserve samples");
+
+    initialize_audio(&audio);
+    init_audio(&audio);
 
     // inicializa timer de 1/FRAMERATE segundos
     timer = al_create_timer(FRAMERATE);
@@ -92,10 +102,14 @@ void state_play()
                 game.frame = (game.frame + 1) % 60;
                 if (!game.frame)
                     --game.time;
+                
                 if (!(game.map.timer))
                 {
                     if (game.lives)
+                    {
                         update_game(&game, key);
+                        play_instant_samples(&audio, &game);
+                    }
                     else
                     {
                         end_game(&game);
@@ -107,7 +121,7 @@ void state_play()
                 }
                 else
                     game.map.timer--;
-                
+
                 redraw = true;
                 break;
             
@@ -174,8 +188,8 @@ void state_finish()
     al_destroy_event_queue(queue);
 
     destroy_sprites(&sprites);
-
     destroy_map(&(game.map));
+    destroy_audio(&audio);
     
     al_shutdown_image_addon();
 

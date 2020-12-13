@@ -3,6 +3,7 @@
 #include "map.h"
 #include "game.h"
 #include "update.h"
+#include "audio.h"
 
 int test_falls(tile_t *t)
 {
@@ -11,8 +12,9 @@ int test_falls(tile_t *t)
             c == BOULDER);
 }
 
-void update_player_speed(map_t *map, unsigned char *key)
+void update_player_speed(game_t *game, unsigned char *key)
 {
+    map_t *map = &(game->map);
     tile_t **mat = map->m[map->cur_m];
     int x = map->player_x;
     int y = map->player_y;
@@ -58,8 +60,9 @@ void update_player_speed(map_t *map, unsigned char *key)
         map->timer = MAP_TIMER;
 }
 
-void update_boulder_speed(map_t *map, int y, int x)
+void update_boulder_speed(game_t *game, int y, int x)
 {
+    map_t *map = &(game->map);
     tile_t **mat = map->m[map->cur_m];
     tile_t *cur = &(mat[y][x]);
     int prev_dy = cur->dy;
@@ -89,6 +92,11 @@ void update_boulder_speed(map_t *map, int y, int x)
 
     if (cur->dx || cur->dy)
         map->timer = MAP_TIMER;
+    if (prev_dy && !cur->dy)
+    {
+        //printf("boulder_hit\n");
+        game->n_plays.boulder_hit = 1;
+    }
 }
 
 void update_diamond_speed(map_t *map, int y, int x)
@@ -117,15 +125,16 @@ void update_diamond_speed(map_t *map, int y, int x)
         map->timer = MAP_TIMER;
 }
 
-void update_tiles_speed(map_t *map, unsigned char *key)
+void update_tiles_speed(game_t *game, unsigned char *key)
 {
+    map_t *map = &(game->map);
     tile_t **mat = map->m[map->cur_m];
 
     for (int i = 1; i <= map->height; ++i)
         for (int j = 1; j <= map->width; ++j)
             mat[i][j].visited = 0;
 
-    update_player_speed(map, key);
+    update_player_speed(game, key);
 
     for (int i = 1; i <= map->height; ++i)
         for (int j = 1; j <= map->width; ++j)
@@ -133,7 +142,7 @@ void update_tiles_speed(map_t *map, unsigned char *key)
             switch(mat[i][j].type)
             {
                 case BOULDER:
-                    update_boulder_speed(map, i, j);
+                    update_boulder_speed(game, i, j);
                     break;
                 case DIAMOND:
                     update_diamond_speed(map, i, j);
@@ -225,7 +234,10 @@ void update_disappear_state(game_t *game)
     if ((dx || dy) && disappears(t) && !(t->dy))
     {
         if (t->type == DIAMOND)
+        {
             game->diamonds_got++;
+            game->n_plays.diamond = 1;
+        }
         t->disappear = 1;
     }
 }
@@ -236,7 +248,7 @@ void update_game(game_t *game, unsigned char *key)
     flip_map_matrix(&(game->map));
 
     reset_disappear_state(&(game->map));
-    update_tiles_speed(&(game->map), key);
+    update_tiles_speed(game, key);
     update_disappear_state(game);
     
     if (game->diamonds_got >= DIAMOND_WIN)
