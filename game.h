@@ -11,6 +11,7 @@ typedef struct samples_s
     int step;
     int victory;
     int open_door;
+    int wow;
 } samples_t;
 
 typedef struct game_s

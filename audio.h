@@ -13,6 +13,7 @@ typedef struct audio_s
     ALLEGRO_SAMPLE *explosion;
     ALLEGRO_SAMPLE *victory;
     ALLEGRO_SAMPLE *open_door;
+    ALLEGRO_SAMPLE *wow;
 } audio_t;
 
 void initialize_audio(audio_t *audio);

@@ -10,6 +10,7 @@ void initialize_samples(samples_t *s)
     s->step = 0;
     s->victory = 0;
     s->open_door = 0;
+    s->wow = 0;
 }
 
 void initialize_game(game_t *game)

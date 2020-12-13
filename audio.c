@@ -11,6 +11,8 @@ void initialize_audio(audio_t *audio)
     audio->boulder_hit = NULL;
     audio->step = NULL;
     audio->victory = NULL;
+    audio->open_door = NULL;
+    audio->wow = NULL;
 }
 
 ALLEGRO_SAMPLE *get_sample(char *filename)
@@ -28,6 +30,7 @@ void init_audio(audio_t *audio)
     audio->step = al_load_sample("sounds/step.wav");
     audio->victory = al_load_sample("sounds/victory.wav");
     audio->open_door = al_load_sample("sounds/open_door.wav");
+    audio->wow = al_load_sample("sounds/wow.wav");
 }
 
 void play_sample(ALLEGRO_SAMPLE *sample, float v)
@@ -52,6 +55,7 @@ void play_instant_samples(audio_t *audio, game_t *game)
     play_audio(audio->diamond, &(n_plays->diamond));
     play_audio(audio->victory, &(n_plays->victory));
     play_audio(audio->open_door, &(n_plays->open_door));
+    play_audio(audio->wow, &(n_plays->wow));
 }
 
 void destroy_audio(audio_t *audio)
@@ -61,4 +65,6 @@ void destroy_audio(audio_t *audio)
     al_destroy_sample(audio->explosion);
     al_destroy_sample(audio->step);
     al_destroy_sample(audio->victory);
+    al_destroy_sample(audio->open_door);
+    al_destroy_sample(audio->wow);
 }

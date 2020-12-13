@@ -57,6 +57,8 @@ void update_player_speed(game_t *game, unsigned char *key)
     mat[y+cur->dy][x+cur->dx].visited = 1;
     if (mat[y+cur->dy][x+cur->dx].type == EXIT)
         game->n_plays.victory = 1;
+    if (mat[y+cur->dy][x+cur->dx].type == FAKE_WALL)
+        game->n_plays.wow = 1;
 
     game->n_plays.step = 0;
     if(cur->dy || cur->dx)
