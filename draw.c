@@ -1,5 +1,6 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
 #include <stdio.h>
 #include "map.h"
 #include "sprites.h"
@@ -110,4 +111,25 @@ void draw_map(sprites_t *sprites, game_t *game)
                 y = TILE_S*(i-1) + timer * mat[i][j].dy;
                 draw_tile(&(mat[i][j]), game, x, y, sprites);
             }
+}
+
+void draw_hud(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
+{
+    char time_text[5];
+    char diamond_text[10];
+    char score_text[6];
+
+    snprintf(score_text, 6, "%05d", game->score);
+    snprintf(time_text, 5, "%d", game->time);
+    snprintf(diamond_text, 10, "%d/%d", game->diamonds_got, DIAMOND_WIN);
+    al_draw_bitmap(sprites->hud, 0, 264, 0);
+    al_draw_text(font, al_map_rgb(255, 255, 255), 140, 272, 0, diamond_text);
+    al_draw_text(font, al_map_rgb(255, 255, 255), 235, 272, 0, time_text);
+    al_draw_text(font, al_map_rgb(255, 255, 255), 309, 272, 0, score_text);
+}
+
+void draw_game(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
+{
+    draw_map(sprites, game);
+    draw_hud(sprites, game, font);
 }

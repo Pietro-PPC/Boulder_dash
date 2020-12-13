@@ -17,6 +17,8 @@ void initialize_sprites(sprites_t *sprites)
     sprites->sheet[0] = NULL;
     sprites->sheet[1] = NULL;
 
+    sprites->hud = NULL;
+
     sprites->blank = NULL;
     sprites->dirt = NULL;
     sprites->border = NULL;
@@ -114,6 +116,9 @@ void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 
     sprites->sheet[1] = al_load_bitmap("sprites/Background-Ingame.png");
     test_init(sprites->sheet[1], "imagem de fundo");
+
+    sprites->hud = al_load_bitmap("sprites/HUD.png");
+    test_init(sprites->hud, "HUD");
 
     sprites->wall = get_sprite(sprites->sheet[0], 84, 0, TILE_S, TILE_S);
     sprites->dirt = get_sprite(sprites->sheet[0], 12, 12, TILE_S, TILE_S);

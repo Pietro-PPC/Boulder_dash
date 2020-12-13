@@ -153,7 +153,7 @@ void state_play()
         if (redraw)
         {
             pre_draw(buffer);
-            draw_map(&sprites, &(game));
+            draw_game(&sprites, &(game), font);
             post_draw(buffer, disp);
             redraw = false;
         }
@@ -168,7 +168,7 @@ void state_endgame()
     while(game.map.timer > 0)
     {
         pre_draw(buffer);
-        draw_map(&sprites, &(game));
+        draw_game(&sprites, &(game), font);
         post_draw(buffer, disp);
         game.map.timer--;
     }

@@ -56,7 +56,10 @@ void update_player_speed(game_t *game, unsigned char *key)
 
     mat[y+cur->dy][x+cur->dx].visited = 1;
     if (mat[y+cur->dy][x+cur->dx].type == EXIT)
+    {
         game->n_plays.victory = 1;
+        game->score += game->time;
+    }
     if (mat[y+cur->dy][x+cur->dx].type == FAKE_WALL)
         game->n_plays.wow = 1;
 
@@ -244,6 +247,7 @@ void update_disappear_state(game_t *game)
         if (t->type == DIAMOND)
         {
             game->diamonds_got++;
+            game->score += 10;
             game->n_plays.diamond = 1;
         }
         t->disappear = 1;

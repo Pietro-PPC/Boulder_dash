@@ -42,6 +42,7 @@ typedef struct exit_bitmaps_s
 typedef struct sprites_s
 {
     ALLEGRO_BITMAP *sheet[2];
+    ALLEGRO_BITMAP *hud;
 
     ALLEGRO_BITMAP *dirt;
     ALLEGRO_BITMAP *wall;
