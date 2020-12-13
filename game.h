@@ -10,6 +10,7 @@ typedef struct samples_s
     int boulder_hit;
     int step;
     int victory;
+    int open_door;
 } samples_t;
 
 typedef struct game_s

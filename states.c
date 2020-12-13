@@ -113,6 +113,8 @@ void state_play()
                     else
                     {
                         end_game(&game);
+                        game.n_plays.explosion = 1;
+                        play_audio(audio.explosion, &(game.n_plays.explosion));
                         done = true;
                         state = ENDGAME;
                     }
@@ -120,8 +122,12 @@ void state_play()
                         key[i] &= KEY_SEEN;
                 }
                 else
+                {
+                    if(game.n_plays.step)
+                        if (game.map.timer % (MAP_TIMER/game.n_plays.step) == 0)
+                            play_sample(audio.step, 0.3);
                     game.map.timer--;
-
+                }
                 redraw = true;
                 break;
             

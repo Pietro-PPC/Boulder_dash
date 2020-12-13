@@ -55,9 +55,15 @@ void update_player_speed(game_t *game, unsigned char *key)
     }
 
     mat[y+cur->dy][x+cur->dx].visited = 1;
+    if (mat[y+cur->dy][x+cur->dx].type == EXIT)
+        game->n_plays.victory = 1;
 
+    game->n_plays.step = 0;
     if(cur->dy || cur->dx)
+    {
+        game->n_plays.step = 2;
         map->timer = MAP_TIMER;
+    }
 }
 
 void update_boulder_speed(game_t *game, int y, int x)
@@ -93,14 +99,12 @@ void update_boulder_speed(game_t *game, int y, int x)
     if (cur->dx || cur->dy)
         map->timer = MAP_TIMER;
     if (prev_dy && !cur->dy)
-    {
-        //printf("boulder_hit\n");
         game->n_plays.boulder_hit = 1;
-    }
 }
 
-void update_diamond_speed(map_t *map, int y, int x)
+void update_diamond_speed(game_t *game, int y, int x)
 {
+    map_t *map = &(game->map);
     tile_t **mat = map->m[map->cur_m];
     tile_t *cur = &(mat[y][x]);
     int prev_dy = cur->dy;
@@ -123,6 +127,8 @@ void update_diamond_speed(map_t *map, int y, int x)
 
     if (cur->dx || cur->dy)
         map->timer = MAP_TIMER;
+    if (prev_dy && !cur->dy)
+        game->n_plays.boulder_hit = 1;
 }
 
 void update_tiles_speed(game_t *game, unsigned char *key)
@@ -145,7 +151,7 @@ void update_tiles_speed(game_t *game, unsigned char *key)
                     update_boulder_speed(game, i, j);
                     break;
                 case DIAMOND:
-                    update_diamond_speed(map, i, j);
+                    update_diamond_speed(game, i, j);
                     break;
             }
         }
@@ -251,8 +257,11 @@ void update_game(game_t *game, unsigned char *key)
     update_tiles_speed(game, key);
     update_disappear_state(game);
     
-    if (game->diamonds_got >= DIAMOND_WIN)
+    if (game->diamonds_got >= DIAMOND_WIN && !game->map.open_exit)
+    {
         game->map.open_exit = 1;
+        game->n_plays.open_door = 1;
+    }
     if (test_player_died(&(game->map)))
         game->lives--;
 }

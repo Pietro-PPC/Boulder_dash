@@ -12,13 +12,16 @@ typedef struct audio_s
     ALLEGRO_SAMPLE *boulder_hit;
     ALLEGRO_SAMPLE *explosion;
     ALLEGRO_SAMPLE *victory;
+    ALLEGRO_SAMPLE *open_door;
 } audio_t;
 
 void initialize_audio(audio_t *audio);
 
 void init_audio(audio_t *audio);
 
-void play_audio(ALLEGRO_SAMPLE *sample);
+void play_sample(ALLEGRO_SAMPLE *sample, float v);
+
+void play_audio(ALLEGRO_SAMPLE *sample, int *n_plays);
 
 void play_instant_samples(audio_t *audio, game_t *game);
 

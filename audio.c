@@ -27,31 +27,31 @@ void init_audio(audio_t *audio)
     audio->explosion = al_load_sample("sounds/explosion.wav");
     audio->step = al_load_sample("sounds/step.wav");
     audio->victory = al_load_sample("sounds/victory.wav");
+    audio->open_door = al_load_sample("sounds/open_door.wav");
 }
 
-void play_audio(ALLEGRO_SAMPLE *sample)
+void play_sample(ALLEGRO_SAMPLE *sample, float v)
 {
-    al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    al_play_sample(sample, v, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+}
+
+void play_audio(ALLEGRO_SAMPLE *sample, int *n_plays)
+{
+    if (*n_plays)
+    {
+        play_sample(sample, 1.0);
+        (*n_plays)--;
+    }
 }
 
 void play_instant_samples(audio_t *audio, game_t *game)
 {
-    //int timer = game->map.timer;
     samples_t *n_plays = &(game->n_plays);
 
-    if (n_plays->boulder_hit)
-    {
-        play_audio(audio->boulder_hit);
-        n_plays->boulder_hit = 0;
-    }
-
-    if (n_plays->diamond)
-    {
-        play_audio(audio->diamond);
-        n_plays->diamond = 0;
-    }
-
-    //if ()
+    play_audio(audio->boulder_hit, &(n_plays->boulder_hit));
+    play_audio(audio->diamond, &(n_plays->diamond));
+    play_audio(audio->victory, &(n_plays->victory));
+    play_audio(audio->open_door, &(n_plays->open_door));
 }
 
 void destroy_audio(audio_t *audio)
