@@ -15,4 +15,6 @@ void draw_game(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font);
 
 void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font);
 
+void draw_instructions(sprites_t *sprites, ALLEGRO_FONT *font, int n);
+
 #endif

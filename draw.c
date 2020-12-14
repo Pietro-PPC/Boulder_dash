@@ -134,7 +134,7 @@ void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font)
 {
     int height = BUFFER_HEIGHT - 4*TILE_S;
     int width = BUFFER_WIDTH - 2*TILE_S; 
-    al_draw_filled_rectangle(2*TILE_S, 2*TILE_S, width, height, al_map_rgba_f(0, 0, 0, 0.85));
+    al_draw_filled_rectangle(2*TILE_S, 2*TILE_S, width, height, al_map_rgba_f(0, 0, 0, 0.9));
     al_draw_text(font, al_map_rgb(255, 255, 255), 170, 3*TILE_S, 0, "H I - S C O R E S");
 
     for (int i = 0; i < scores->size; ++i)
@@ -148,8 +148,108 @@ void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font)
     al_draw_text(font, al_map_rgb(255, 255, 255), 140, 19*TILE_S, 0, "PRESSIONE ESC PARA SAIR...");
 }
 
+void draw_instructions(sprites_t *sprites, ALLEGRO_FONT *font, int n)
+{
+    int height = BUFFER_HEIGHT - 4*TILE_S;
+    int width = BUFFER_WIDTH - 2*TILE_S;
+    al_draw_filled_rectangle(2*TILE_S, 2*TILE_S, width, height, al_map_rgba_f(0, 0, 0, 0.9));
+
+    char page[4];
+    sprintf(page, "%d/3", n);
+    al_draw_text(font, al_map_rgb(255, 255, 255), 160, 3*TILE_S, 0, "I N S T R U Ç Õ E S");
+    al_draw_text(font, al_map_rgb(255, 255, 255), 420, 3*TILE_S, 0, page);
+
+    if (n == 1)
+    {
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 7*TILE_S, 0,
+                        "O objetivo do Boulder Dash é bem simples. Colete");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 8*TILE_S, 0,
+                        "certo número de diamantes para abrir a saída do");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 9*TILE_S, 0,
+                        "mapa e mova-se até ela para terminar o nível. Sua");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 10*TILE_S, 0,
+                        "pontuação será maior se você coletar mais diamantes");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 11*TILE_S, 0,
+                        "e chegar à saída do nível em um tempo menor.");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 13*TILE_S, 0,
+                        "Para se mover pelo mapa, (e por estas instruções),");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 14*TILE_S, 0,
+                        "use as setas do seu teclado. Para desistir da");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 15*TILE_S, 0,
+                        "partida atual, pressione a tecla ESC.");
+    }
+    else if (n == 2)
+    {
+        al_draw_scaled_bitmap(sprites->player.stop, 
+                            0, 0, TILE_S, TILE_S, 
+                            3*TILE_S, 5*TILE_S, 1.5*TILE_S, 1.5*TILE_S, 0);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 4.5*TILE_S, 0,
+                        "Jogador: este é você, o herói do jogo! Colete o");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 5.5*TILE_S, 0,
+                        "máximo possível de diamantes e encontre a saída.");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 6.5*TILE_S, 0,
+                        "no menor tempo possível.");
+
+        al_draw_scaled_bitmap(sprites->boulder.stop, 
+                            0, 0, TILE_S, TILE_S, 
+                            3*TILE_S, 8.5*TILE_S, 1.5*TILE_S, 1.5*TILE_S, 0);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 8.5*TILE_S, 0,
+                        "Pedra: pode ser empurrada, mas não deixe-a");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 9.5*TILE_S, 0,
+                        "cair na sua cabeça!");
+
+        al_draw_scaled_bitmap(sprites->diamond.stop, 
+                            0, 0, TILE_S, TILE_S, 
+                            3*TILE_S, 11.5*TILE_S, 1.5*TILE_S, 1.5*TILE_S, 0);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 11.5*TILE_S, 0,
+                        "Diamante: colete o suficiente e poderá sair da");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 12.5*TILE_S, 0,
+                        "fase. Mas tome cuidado com sua cabeça também!");
+
+        al_draw_scaled_bitmap(sprites->exit.closed, 
+                            0, 0, TILE_S, TILE_S, 
+                            3*TILE_S, 14.5*TILE_S, 1.5*TILE_S, 1.5*TILE_S, 0);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 14.5*TILE_S, 0,
+                        "Saída: colete diamantes suficientes e a porta");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 15.5*TILE_S, 0,
+                        "de saída se abrirá.");
+
+        al_draw_scaled_bitmap(sprites->wall, 
+                            0, 0, TILE_S, TILE_S, 
+                            3*TILE_S, 17.5*TILE_S, 1.5*TILE_S, 1.5*TILE_S, 0);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 17.5*TILE_S, 0,
+                        "Paredes: Não há muito o que falar sobre elas.");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 18.5*TILE_S, 0,
+                        "Apenas bloqueiam seu caminho.");
+    }
+    else if (n == 3)
+    {
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 5*TILE_S, 0,
+                        "Jogo desenvolvido por Pietro Polinari Cavassin,");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 6*TILE_S, 0,
+                        "aluno do curso de bacharelado em ciência da");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 7*TILE_S, 0,
+                        "computação pela UFPR, para a disciplina de");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 8*TILE_S, 0,
+                        "programação 2, ministrada pelo professor Carlos");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 9*TILE_S, 0,
+                        "Maziero.");
+
+        al_draw_text(font, al_map_rgb(255, 255, 255), 15*TILE_S, 11*TILE_S, 0,
+                        "C R É D I T O S");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 12.5*TILE_S, 0,
+                        "Design dos spritesheets:            Retrocade.net");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 14*TILE_S, 0,
+                        "Efeitos sonoros:                            JSFXR");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 15.5*TILE_S, 0,
+                        "Biblioteca de desenvolvimento:          Allegro 5");
+
+    }
+}
+
 void draw_game(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
 {
     draw_map(sprites, game);
     draw_hud(sprites, game, font);
+    draw_instructions(sprites, font, 3);
 }
