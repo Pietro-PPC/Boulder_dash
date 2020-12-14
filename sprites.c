@@ -111,13 +111,13 @@ void init_exit_sprites(sprites_t *sprites)
 
 void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
 {
-    sprites->sheet[0] = al_load_bitmap("sprites/tileset.png");
+    sprites->sheet[0] = al_load_bitmap("resources/sprites/tileset.png");
     test_init(sprites->sheet[0], "tileset de sprites");
 
-    sprites->sheet[1] = al_load_bitmap("sprites/Background-Ingame.png");
+    sprites->sheet[1] = al_load_bitmap("resources/sprites/Background-Ingame.png");
     test_init(sprites->sheet[1], "imagem de fundo");
 
-    sprites->hud = al_load_bitmap("sprites/HUD.png");
+    sprites->hud = al_load_bitmap("resources/sprites/HUD.png");
     test_init(sprites->hud, "HUD");
 
     sprites->wall = get_sprite(sprites->sheet[0], 84, 0, TILE_S, TILE_S);

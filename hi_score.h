@@ -1,7 +1,7 @@
 #ifndef __HISCORE__
 #define __HISCORE__
 
-#define SCORE_FILE "data/hi_scores.txt"
+#define SCORE_FILE "resources/data/hi_scores.txt"
 #define SCORE_NUM 5
 
 typedef struct scores_s

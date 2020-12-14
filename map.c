@@ -58,7 +58,7 @@ void allocate_map(tile_t ***map, int w, int h)
 void read_map(map_t *map)
 {
     FILE *f;
-    char filename[101] = "levelmaps/";
+    char filename[101] = "resources/levelmaps/";
     strcat(filename, LEVELFILE);
 
     // Abre arquivo do nível

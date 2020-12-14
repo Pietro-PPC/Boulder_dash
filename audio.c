@@ -24,13 +24,13 @@ ALLEGRO_SAMPLE *get_sample(char *filename)
 
 void init_audio(audio_t *audio)
 {
-    audio->boulder_hit = get_sample("sounds/boulder_hit.wav");
-    audio->diamond = al_load_sample("sounds/diamond.wav");
-    audio->explosion = al_load_sample("sounds/explosion.wav");
-    audio->step = al_load_sample("sounds/step.wav");
-    audio->victory = al_load_sample("sounds/victory.wav");
-    audio->open_door = al_load_sample("sounds/open_door.wav");
-    audio->wow = al_load_sample("sounds/wow.wav");
+    audio->boulder_hit = get_sample("resources/sounds/boulder_hit.wav");
+    audio->diamond = al_load_sample("resources/sounds/diamond.wav");
+    audio->explosion = al_load_sample("resources/sounds/explosion.wav");
+    audio->step = al_load_sample("resources/sounds/step.wav");
+    audio->victory = al_load_sample("resources/sounds/victory.wav");
+    audio->open_door = al_load_sample("resources/sounds/open_door.wav");
+    audio->wow = al_load_sample("resources/sounds/wow.wav");
 }
 
 void play_sample(ALLEGRO_SAMPLE *sample, float v)
