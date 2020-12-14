@@ -17,12 +17,14 @@ ALLEGRO_DISPLAY* disp;
 ALLEGRO_BITMAP *buffer;
 ALLEGRO_FONT* font;
 ALLEGRO_EVENT_QUEUE* queue;
-ALLEGRO_EVENT event;
+ALLEGRO_EVENT event, menu_event;
 
 scores_t scores;
 game_t game;
 audio_t audio;
 sprites_t sprites;
+
+unsigned char key[ALLEGRO_KEY_MAX];
 
 void state_initialize()
 // Inicializa todas as variáveis e structs necessárias para o jogo
@@ -86,20 +88,22 @@ void state_initialize()
     // le arquivo com maiores pontuações
     get_hi_scores(&scores);
 
+    memset(key, 0, ALLEGRO_KEY_MAX);
+
     state = PLAY;
 }
 
 void state_play()
 {
-    unsigned char key[ALLEGRO_KEY_MAX];
-    memset(key, 0, ALLEGRO_KEY_MAX);
+
     bool redraw = true;
     bool done = false;
 
     state = FINISH;
 
+    al_flush_event_queue(queue);
     // loop principal
-    while(true)
+    for(;;)
     {
         al_wait_for_event(queue, &event);
         
@@ -156,6 +160,13 @@ void state_play()
         }
         if (key[ALLEGRO_KEY_ESCAPE])
             game.lives = 0;
+        else if (key[ALLEGRO_KEY_H] || key[ALLEGRO_KEY_F1])
+        {
+            key[ALLEGRO_KEY_H] = 0;
+            key[ALLEGRO_KEY_F1] = 0;
+            state = INSTRUCTIONS;
+            done = true;
+        }
 
         if (done)
             break;
@@ -169,6 +180,58 @@ void state_play()
             redraw = false;
         }
     }
+}
+
+void state_instructions()
+{
+    printf("entrou\n");
+    state = PLAY;
+
+    int instruction_num = 0;
+    int done = 0;
+    int draw = 1;
+    
+    al_flush_event_queue(queue);
+    for (;;)
+    {
+        al_wait_for_event(queue, &menu_event);
+
+        if (menu_event.type == ALLEGRO_EVENT_KEY_CHAR)
+        {
+            switch (menu_event.keyboard.keycode)
+            {
+                case ALLEGRO_KEY_RIGHT:
+                    instruction_num = (instruction_num+1)%3;
+                    draw = 1;
+                    break;
+                case ALLEGRO_KEY_LEFT:
+                    if (instruction_num)
+                        instruction_num--;
+                    else
+                        instruction_num = 2;
+                    draw = 1;
+                    break;
+                case ALLEGRO_KEY_F1:
+                case ALLEGRO_KEY_H:
+                    done = 1;
+                    break;
+            }
+        }
+
+        if (done)
+            break;
+
+        if (draw)
+        {
+            pre_draw(buffer);
+            draw_game(&sprites, &(game), font);
+            draw_instructions(&sprites, font, instruction_num+1);
+            post_draw(buffer, disp);
+            draw = 0;
+        }
+
+    }
+    printf("saiu\n");
 }
 
 void state_endgame()
