@@ -198,7 +198,7 @@ void state_instructions()
     int done = 0;
     int draw = 1;
     
-    // limpa fila de eventos 
+    // limpa fila de eventos (teclas F1 e/ou H apertadas)
     al_flush_event_queue(queue);
     for (;;)
     {
@@ -208,18 +208,18 @@ void state_instructions()
         {
             switch (menu_event.keyboard.keycode)
             {
-                case ALLEGRO_KEY_RIGHT:
+                case ALLEGRO_KEY_RIGHT: // vai para próxima página de menu
                     instruction_num = (instruction_num+1)%3;
                     draw = 1;
                     break;
-                case ALLEGRO_KEY_LEFT:
+                case ALLEGRO_KEY_LEFT: // volta uma página de menu
                     if (instruction_num)
                         instruction_num--;
                     else
                         instruction_num = 2;
                     draw = 1;
                     break;
-                case ALLEGRO_KEY_F1:
+                case ALLEGRO_KEY_F1: // sai do menu
                 case ALLEGRO_KEY_H:
                     done = 1;
                     break;
@@ -229,7 +229,7 @@ void state_instructions()
         if (done)
             break;
 
-        if (draw)
+        if (draw) // desenha men de instruções
         {
             pre_draw(buffer);
             draw_game(&sprites, &(game), font);
@@ -242,10 +242,12 @@ void state_instructions()
 }
 
 void state_endgame()
+// termina o jogo e mostra maiores pontuações
 {
     state = FINISH;
     bool done = false;
 
+    // mostra últimas animações do jogo
     while(game.map.timer > 0)
     {
         pre_draw(buffer);
@@ -254,15 +256,19 @@ void state_endgame()
         game.map.timer--;
     }
 
+    // insere pontuação no vetor de pontuações
     insert_score(&scores, "???", game.score);
 
+    // imprime maiores pontuações na frente do jogo
     pre_draw(buffer);
     draw_game(&sprites, &(game), font);
     draw_hi_scores(&scores, font);
     post_draw(buffer, disp);
     
+    // salva maiores pontuações no arquivo
     save_hi_scores(&scores);
 
+    // aguarda tecla esc ou fechar o display
     while (1)
     {
         al_wait_for_event(queue, &event);
@@ -277,6 +283,7 @@ void state_endgame()
 }
 
 void state_finish()
+// desaloca todas as estruturas usadas no jogo
 {
     al_destroy_font(font);
     al_destroy_display(disp);
@@ -289,6 +296,8 @@ void state_finish()
     destroy_audio(&audio);
     
     al_shutdown_image_addon();
+    al_shutdown_font_addon();
+    al_shutdown_primitives_addon();
 
     exit(0);
 }
