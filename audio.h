@@ -5,6 +5,7 @@
 #ifndef __AUDIO__
 #define __AUDIO__
 
+// struct que armazena samples dos áudios desejados
 typedef struct audio_s
 {
     ALLEGRO_SAMPLE *diamond;

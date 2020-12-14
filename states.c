@@ -88,6 +88,7 @@ void state_initialize()
     // le arquivo com maiores pontuações
     get_hi_scores(&scores);
 
+    // inicializa vetor com teclas do teclado
     memset(key, 0, ALLEGRO_KEY_MAX);
 
     state = PLAY;
@@ -95,7 +96,6 @@ void state_initialize()
 
 void state_play()
 {
-
     bool redraw = true;
     bool done = false;
 
@@ -111,11 +111,12 @@ void state_play()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
+                // atualiza variáveis de tempo
                 game.frame = (game.frame + 1) % 60;
                 if (!game.frame)
                     --game.time;
                 
-                if (!(game.map.timer))
+                if (!(game.map.timer)) // se não há nenhuma entidade mudando de posição
                 {
                     if (game.lives && !game.endgame)
                     {
@@ -184,7 +185,6 @@ void state_play()
 
 void state_instructions()
 {
-    printf("entrou\n");
     state = PLAY;
 
     int instruction_num = 0;
@@ -231,7 +231,6 @@ void state_instructions()
         }
 
     }
-    printf("saiu\n");
 }
 
 void state_endgame()

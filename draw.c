@@ -11,11 +11,14 @@
 #include "hi_score.h"
 
 void pre_draw(ALLEGRO_BITMAP *bitmap)
+// Prepara bitmap para receber desenho
 {
     al_set_target_bitmap(bitmap);
 }
 
 void post_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_DISPLAY *disp)
+// Volta buffer de desenho para o display e desenha o bitmap
+// em escala no display
 {
     al_set_target_backbuffer(disp);
     al_draw_scaled_bitmap(bitmap, 
@@ -26,12 +29,18 @@ void post_draw(ALLEGRO_BITMAP *bitmap, ALLEGRO_DISPLAY *disp)
 }
 
 void draw_tile(tile_t *t, game_t *game, int x, int y, sprites_t *sprites)
+// desenha tile passado como parâmetro em seu estado atual.
 {
     map_t *map = &(game->map);
+
+    // para pegar sprites em ordem crescente
     int timer = MAP_TIMER - map->timer;
+
+    // state representa um dos 6 estados do sprite
     int state = timer/2;
     if (timer == 12) state = 5;
     
+    // estado da porta de saída
     int exit_state;
 
     switch (t->type)
@@ -44,9 +53,9 @@ void draw_tile(tile_t *t, game_t *game, int x, int y, sprites_t *sprites)
                 al_draw_bitmap(sprites->dirt, x, y, 0);
             break;
         case BOULDER:
-            if (t->dx < 0)
+            if (t->dx < 0) // rola para direita
                 al_draw_bitmap(sprites->boulder.roll[state], x, y, 0);
-            else if (t->dx > 0)
+            else if (t->dx > 0) // rola para esquerda (mostra estados do sprite ao contrário)
                 al_draw_bitmap(sprites->boulder.roll[N_TRANSITION - (state+1)], x, y, 0);
             else
                 al_draw_bitmap(sprites->boulder.stop, x, y, 0);
@@ -55,17 +64,17 @@ void draw_tile(tile_t *t, game_t *game, int x, int y, sprites_t *sprites)
             al_draw_bitmap(sprites->wall, x, y, 0);
             break;
         case DIAMOND:
-            if (t->disappear)
+            if (t->disappear) // diamante some gradualmente
                 al_draw_bitmap(sprites->diamond.disappear[state], x, y, 0);
-            else if (t->dy || t->dx)
+            else if (t->dy || t->dx) // iluminação do diamante muda com movimento
                 al_draw_bitmap(sprites->diamond.fall[state], x, y, 0);
             else
                 al_draw_bitmap(sprites->diamond.stop, x, y, 0);
             break;
         case PLAYER:
-            if (t->dx > 0 || t->dy)
+            if (t->dx > 0 || t->dy) // player corre para direita ou verticalmente
                 al_draw_bitmap(sprites->player.run_right[state], x, y, 0);
-            else if (t->dx < 0)
+            else if (t->dx < 0) // player corre para esquerda
                 al_draw_bitmap(sprites->player.run_left[state], x, y, 0);
             else
                 al_draw_bitmap(sprites->player.stop, x, y, 0);
@@ -75,7 +84,7 @@ void draw_tile(tile_t *t, game_t *game, int x, int y, sprites_t *sprites)
             break;
         case EXIT:
             exit_state = (game->frame/6)%6;
-            if (map->open_exit)
+            if (map->open_exit) // animação para porta aberta
                 al_draw_bitmap(sprites->exit.open[exit_state], x, y, 0);
             else
                 al_draw_bitmap(sprites->exit.closed, x, y, 0);
@@ -90,25 +99,31 @@ void draw_tile(tile_t *t, game_t *game, int x, int y, sprites_t *sprites)
 void draw_map(sprites_t *sprites, game_t *game)
 {
     map_t *map = &(game->map);
+    // desenha fundo neutro
     al_draw_bitmap(sprites->background, 0, 0, 0);
 
     tile_t **mat = map->m[map->cur_m];
     int x, y;
+
+    // tempo decorrido do inicio da transição
     int timer = MAP_TIMER - map->timer;
 
+    // desenha primeiro objetos estáticos
     for (int i = 1; i <= map->height; ++i)
         for (int j = 1; j <= map->width; ++j)
             if (!mat[i][j].dx && !mat[i][j].dy)
             {
-                x = TILE_S*(j-1) + timer * mat[i][j].dx;
-                y = TILE_S*(i-1) + timer * mat[i][j].dy;
+                x = TILE_S*(j-1);
+                y = TILE_S*(i-1);
                 draw_tile(&(mat[i][j]), game, x, y, sprites);
             }
 
+    // depois desenha objetos que se movem
     for (int i = 1; i <= map->height; ++i)
         for (int j = 1; j <= map->width; ++j)
             if (mat[i][j].dx || mat[i][j].dy)
             {
+                // movimentos graduais na vertical e horizontal
                 x = TILE_S*(j-1) + timer * mat[i][j].dx;
                 y = TILE_S*(i-1) + timer * mat[i][j].dy;
                 draw_tile(&(mat[i][j]), game, x, y, sprites);
@@ -116,29 +131,39 @@ void draw_map(sprites_t *sprites, game_t *game)
 }
 
 void draw_hud(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
+// desenhar hud com tempo, número de diamantes e pontuação
 {
     char time_text[5];
     char diamond_text[10];
     char score_text[6];
 
+    // inicializa strings com pontuação, tempo e numero de diamantes
     snprintf(score_text, 6, "%05d", game->score);
     snprintf(time_text, 5, "%d", game->time);
     snprintf(diamond_text, 10, "%d/%d", game->diamonds_got, DIAMOND_WIN);
+
+    // escreve hud com dados no display
     al_draw_bitmap(sprites->hud, 0, 264, 0);
     al_draw_text(font, al_map_rgb(255, 255, 255), 140, 272, 0, diamond_text);
     al_draw_text(font, al_map_rgb(255, 255, 255), 235, 272, 0, time_text);
     al_draw_text(font, al_map_rgb(255, 255, 255), 309, 272, 0, score_text);
+
+    // escreve retângulo com teclas para menu de ajuda
     al_draw_filled_rectangle(375, 267, 469, 283, al_map_rgba_f(0, 0, 0, 0.7));
     al_draw_text(font, al_map_rgb(255, 255, 255), 383, 272, 0, "HELP: h/F1");
 }
 
 void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font)
+// desenha menu final com maiores pontuações
 {
     int height = BUFFER_HEIGHT - 4*TILE_S;
-    int width = BUFFER_WIDTH - 2*TILE_S; 
+    int width = BUFFER_WIDTH - 2*TILE_S;
+
+    // Desenha retângulo do menu com título
     al_draw_filled_rectangle(2*TILE_S, 2*TILE_S, width, height, al_map_rgba_f(0, 0, 0, 0.9));
     al_draw_text(font, al_map_rgb(255, 255, 255), 170, 3*TILE_S, 0, "H I - S C O R E S");
 
+    // Desenha pontuações e jogadores que as fizeram
     for (int i = 0; i < scores->size; ++i)
     {
         char pts[10];
@@ -151,17 +176,20 @@ void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font)
 }
 
 void draw_instructions(sprites_t *sprites, ALLEGRO_FONT *font, int n)
+// Desenha página n do menu de instruções
 {
+    // desenha retângulo de menu
     int height = BUFFER_HEIGHT - 4*TILE_S;
     int width = BUFFER_WIDTH - 2*TILE_S;
     al_draw_filled_rectangle(2*TILE_S, 2*TILE_S, width, height, al_map_rgba_f(0, 0, 0, 0.9));
 
+    // Desenha header do menu de instruções
     char page[4];
     sprintf(page, "%d/3", n);
     al_draw_text(font, al_map_rgb(255, 255, 255), 160, 3*TILE_S, 0, "I N S T R U Ç Õ E S");
     al_draw_text(font, al_map_rgb(255, 255, 255), 420, 3*TILE_S, 0, page);
 
-    if (n == 1)
+    if (n == 1) // desenha primeira página do menu de instruções
     {
         al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 7*TILE_S, 0,
                         "O objetivo do Boulder Dash é bem simples. Colete");
@@ -180,7 +208,7 @@ void draw_instructions(sprites_t *sprites, ALLEGRO_FONT *font, int n)
         al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 15*TILE_S, 0,
                         "partida atual, pressione a tecla ESC.");
     }
-    else if (n == 2)
+    else if (n == 2) // Desenha segunda página do menu de instruções
     {
         al_draw_scaled_bitmap(sprites->player.stop, 
                             0, 0, TILE_S, TILE_S, 
@@ -224,7 +252,7 @@ void draw_instructions(sprites_t *sprites, ALLEGRO_FONT *font, int n)
         al_draw_text(font, al_map_rgb(255, 255, 255), 5*TILE_S, 18.5*TILE_S, 0,
                         "Apenas bloqueiam seu caminho.");
     }
-    else if (n == 3)
+    else if (n == 3) // desenha terceira parte do menu de instruções
     {
         al_draw_text(font, al_map_rgb(255, 255, 255), 3*TILE_S, 5*TILE_S, 0,
                         "Jogo desenvolvido por Pietro Polinari Cavassin,");
@@ -250,6 +278,7 @@ void draw_instructions(sprites_t *sprites, ALLEGRO_FONT *font, int n)
 }
 
 void draw_game(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
+// desenha tela atual do jogo
 {
     draw_map(sprites, game);
     draw_hud(sprites, game, font);

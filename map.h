@@ -17,14 +17,16 @@
 #define LEVELFILE "level_1.txt"
 #define MAP_TIMER 12
 
+// struct que representa um bloco do mapa
 typedef struct tile_s
 {
-    int dx, dy;
-    char type;
-    int visited;
-    int disappear;
+    int dx, dy;    // variação horizontal e vertical da velocidade
+    char type;     // tipo do bloco (se é jogador, pedra, parede...)
+    int visited;   // se nessa atualização do mapa, já foi definida a entidade que irá para esse bloco
+    int disappear; // se esse bloco irá desaparecer na próxima atualização do mapa
 } tile_t;
 
+// struct com dados sobre estado atual do mapa
 typedef struct map_s
 {
     int width;       // largura do mapa

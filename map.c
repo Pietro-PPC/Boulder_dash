@@ -8,6 +8,7 @@
 #include "sprites.h"
 
 void initialize_map(map_t *map)
+// inicializa valores da struct do mapa
 {
     map->width = 0;
     map->height = 0;
@@ -15,11 +16,14 @@ void initialize_map(map_t *map)
     map->cur_m = 0;
     map->diamond_n = 0;
     map->open_exit = 0;
+    map->player_x = 0;
+    map->player_y = 0;
     map->m[0] = NULL;
     map->m[1] = NULL;
 }
 
 void initialize_tile(tile_t *t, char type)
+// inicializa posição da matriz com tipo 'type'
 {
     t->dx = 0;
     t->dy = 0;
@@ -29,6 +33,7 @@ void initialize_tile(tile_t *t, char type)
 }
 
 void initialize_map_matrix(tile_t **m, int w, int h)
+// inicializa matriz de entidades do mapa
 {
     for (int i = 0; i < h+2; ++i)
         for (int j = 0; j < w+2; ++j)
@@ -39,6 +44,7 @@ void initialize_map_matrix(tile_t **m, int w, int h)
 }
 
 void allocate_map(tile_t ***map, int w, int h)
+// aloca matriz de entidades do mapa
 {
     // Alocar ponteiros para linhas
     (*map) = malloc((h+2) * sizeof(tile_t *));
@@ -56,6 +62,7 @@ void allocate_map(tile_t ***map, int w, int h)
 }
 
 void read_map(map_t *map)
+// lê valores do mapa armazenados no arquivo LEVELFILE
 {
     FILE *f;
     char filename[101] = "resources/levelmaps/";
@@ -80,9 +87,11 @@ void read_map(map_t *map)
     initialize_map_matrix(map->m[0], map->width, map->height);
     initialize_map_matrix(map->m[1], map->width, map->height);
 
+    // inicializa posição do player
     map->player_y = 0;
     map->player_x = 0;
 
+    // lê caracteres do mapa
     tile_t **initMap = map->m[map->cur_m];
     for (int i = 1; i <= map->height && !feof(f); ++i)
     {
@@ -92,13 +101,14 @@ void read_map(map_t *map)
             switch (initMap[i][j].type)
             {
                 case PLAYER:
-                    if (map->player_y || map->player_x)
+                    if (map->player_y || map->player_x) // apareceu mais de um jogador
                         fatal_error("Sem suporte para mais de um jogador!");
+                    // armazena coordenadas do jogador
                     map->player_y = i;
                     map->player_x = j;
                     break;
                 case DIAMOND:
-                    map->diamond_n++;
+                    map->diamond_n++; // incrementa contador de diamantes
                     break;
             }
         }
@@ -115,6 +125,7 @@ void read_map(map_t *map)
 }
 
 int test_walkable(tile_t *t)
+// testa se é possível andar através do bloco t
 {
     char c = t->type;
     return !(c == BOULDER ||
@@ -124,6 +135,7 @@ int test_walkable(tile_t *t)
 }
 
 int test_solid(tile_t *t)
+// testa se bloco t é sólido
 {
     char c = t->type;
     return (c == BOULDER ||
@@ -133,6 +145,7 @@ int test_solid(tile_t *t)
 }
 
 void assign_tile(tile_t *d, tile_t *s)
+// assinala valores do bloco source ao bloco destino
 {
     d->dx = s->dx;
     d->dy = s->dy;
@@ -140,6 +153,7 @@ void assign_tile(tile_t *d, tile_t *s)
 }
 
 void destroy_map_matrix(tile_t ***m, int w, int h)
+// desaloca matriz do mapa
 {
     for (int i = 1; i < h; ++i)
         (*m)[i] = NULL;
@@ -154,6 +168,7 @@ void destroy_map_matrix(tile_t ***m, int w, int h)
 }
 
 void destroy_map(map_t *map)
+// desaloca matrizes do map
 {
     destroy_map_matrix(&(map->m[0]), map->width, map->height);
     destroy_map_matrix(&(map->m[1]), map->width, map->height);

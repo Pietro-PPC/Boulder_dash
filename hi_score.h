@@ -6,9 +6,9 @@
 
 typedef struct scores_s
 {
-    char name[SCORE_NUM+1][4];
-    int score[SCORE_NUM+1];
-    int size;
+    char name[SCORE_NUM+1][4]; // vetor com nome dos jogadores
+    int score[SCORE_NUM+1];    // vetor com pontuação dos jogadores
+    int size;                  // tamanho do vetor
 } scores_t;
 
 void save_hi_scores(scores_t *scores);

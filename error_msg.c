@@ -3,6 +3,7 @@
 #include "error_msg.h"
 
 void fatal_error(char *message)
+// Imprime message em stderr e aborta
 {
     fprintf(stderr, "%s\n", message);
     exit(1);

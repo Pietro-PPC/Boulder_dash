@@ -8,6 +8,7 @@
 #define TILE_S 12
 #define N_TRANSITION 6
 
+// structs para entidades com mais de um estado visual
 typedef struct player_bitmaps_s
 {
     ALLEGRO_BITMAP *stop;
@@ -39,6 +40,8 @@ typedef struct exit_bitmaps_s
     ALLEGRO_BITMAP *open[N_TRANSITION];
 } exit_bitmaps_t;
 
+
+// struct para todos os bitmaps do jogo
 typedef struct sprites_s
 {
     ALLEGRO_BITMAP *sheet[2];

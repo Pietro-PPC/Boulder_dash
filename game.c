@@ -3,6 +3,7 @@
 #include "map.h"
 
 void initialize_samples(samples_t *s)
+// inicializa variaveis da struct sample
 {
     s->boulder_hit = 0;
     s->diamond = 0;
@@ -14,6 +15,7 @@ void initialize_samples(samples_t *s)
 }
 
 void initialize_game(game_t *game)
+// inicializa variáveis da struct do jogo
 {
     initialize_map(&(game->map));
     initialize_samples((&game->n_plays));
