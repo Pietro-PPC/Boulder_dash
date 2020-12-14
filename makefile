@@ -1,5 +1,5 @@
 CFLAGS = -Wall -std=c99
-PKG_CONFIG=`pkg-config allegro-5 allegro_font-5 allegro_image-5 allegro_audio-5 allegro_acodec-5 --libs --cflags`
+PKG_CONFIG=`pkg-config allegro-5 allegro_font-5 allegro_image-5 allegro_audio-5 allegro_acodec-5 allegro_primitives-5 --libs --cflags`
 
 all: main.c states.o map.o sprites.o error_msg.o draw.o update.o game.o audio.o hi_score.o
 	gcc main.c states.o map.o sprites.o error_msg.o draw.o update.o game.o audio.o hi_score.o -o boulder_dash $(PKG_CONFIG) $(CFLAGS)

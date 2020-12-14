@@ -1,5 +1,6 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include "states.h"
 #include "map.h"
@@ -31,15 +32,17 @@ void state_initialize()
 
     // inicializa teclado
     test_init(al_install_keyboard(), "teclado");
-
-    // inicializa addon de imagens
+    
+    // inicializa addons
     test_init(al_init_image_addon(), "addon de imagem");
+    test_init(al_init_primitives_addon(), "addon de primitivos");
 
     // funções de inicialização do audio
     test_init(al_install_audio(), "audio");
     test_init(al_init_acodec_addon(), "audio codecs");
     test_init(al_reserve_samples(16), "reserve samples");
 
+    // inicializa variaveis de audio e carrega audios
     initialize_audio(&audio);
     init_audio(&audio);
 
@@ -80,6 +83,7 @@ void state_initialize()
     initialize_sprites(&sprites);
     init_sprites(&sprites, &(game.map), disp);
 
+    // le arquivo com maiores pontuações
     get_hi_scores(&scores);
 
     state = PLAY;
@@ -151,7 +155,7 @@ void state_play()
                 break;
         }
         if (key[ALLEGRO_KEY_ESCAPE])
-            done = true;
+            game.lives = 0;
 
         if (done)
             break;
@@ -181,13 +185,20 @@ void state_endgame()
     }
 
     insert_score(&scores, "???", game.score);
+
+    pre_draw(buffer);
+    draw_game(&sprites, &(game), font);
+    draw_hi_scores(&scores, font);
+    post_draw(buffer, disp);
+    
     save_hi_scores(&scores);
 
     while (1)
     {
         al_wait_for_event(queue, &event);
 
-        if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+        if ((event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ESCAPE ) ||
+            event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             done = true;
         
         if (done)

@@ -251,6 +251,8 @@ void update_disappear_state(game_t *game)
             game->score += 10;
             game->n_plays.diamond = 1;
         }
+        else if(t->type == FAKE_WALL)
+            game->score += 50;
         t->disappear = 1;
     }
 }

@@ -1,5 +1,6 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <stdio.h>
 #include "map.h"
@@ -7,6 +8,7 @@
 #include "draw.h"
 #include "states.h"
 #include "game.h"
+#include "hi_score.h"
 
 void pre_draw(ALLEGRO_BITMAP *bitmap)
 {
@@ -126,6 +128,24 @@ void draw_hud(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
     al_draw_text(font, al_map_rgb(255, 255, 255), 140, 272, 0, diamond_text);
     al_draw_text(font, al_map_rgb(255, 255, 255), 235, 272, 0, time_text);
     al_draw_text(font, al_map_rgb(255, 255, 255), 309, 272, 0, score_text);
+}
+
+void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font)
+{
+    int height = BUFFER_HEIGHT - 4*TILE_S;
+    int width = BUFFER_WIDTH - 2*TILE_S; 
+    al_draw_filled_rectangle(2*TILE_S, 2*TILE_S, width, height, al_map_rgba_f(0, 0, 0, 0.85));
+    al_draw_text(font, al_map_rgb(255, 255, 255), 170, 3*TILE_S, 0, "H I - S C O R E S");
+
+    for (int i = 0; i < scores->size; ++i)
+    {
+        char pts[10];
+        sprintf(pts, "%d", scores->score[i]);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 170, (7 + 2*i)*TILE_S, 0, scores->name[i]);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 270, (7 + 2*i)*TILE_S, 0, pts);
+    }
+
+    al_draw_text(font, al_map_rgb(255, 255, 255), 140, 19*TILE_S, 0, "PRESSIONE ESC PARA SAIR...");
 }
 
 void draw_game(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
