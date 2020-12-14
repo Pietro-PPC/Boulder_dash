@@ -128,6 +128,8 @@ void draw_hud(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
     al_draw_text(font, al_map_rgb(255, 255, 255), 140, 272, 0, diamond_text);
     al_draw_text(font, al_map_rgb(255, 255, 255), 235, 272, 0, time_text);
     al_draw_text(font, al_map_rgb(255, 255, 255), 309, 272, 0, score_text);
+    al_draw_filled_rectangle(375, 267, 469, 283, al_map_rgba_f(0, 0, 0, 0.7));
+    al_draw_text(font, al_map_rgb(255, 255, 255), 383, 272, 0, "HELP: h/F1");
 }
 
 void draw_hi_scores(scores_t *scores, ALLEGRO_FONT *font)
@@ -251,5 +253,4 @@ void draw_game(sprites_t *sprites, game_t *game, ALLEGRO_FONT *font)
 {
     draw_map(sprites, game);
     draw_hud(sprites, game, font);
-    draw_instructions(sprites, font, 3);
 }
