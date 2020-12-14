@@ -88,6 +88,7 @@ void state_initialize()
     // le arquivo com maiores pontuações
     get_hi_scores(&scores);
 
+
     // inicializa vetor com teclas do teclado
     memset(key, 0, ALLEGRO_KEY_MAX);
 
@@ -98,7 +99,6 @@ void state_play()
 {
     bool redraw = true;
     bool done = false;
-
     state = FINISH;
 
     al_flush_event_queue(queue);
@@ -118,15 +118,16 @@ void state_play()
                 
                 if (!(game.map.timer)) // se não há nenhuma entidade mudando de posição
                 {
-                    if (game.lives && !game.endgame)
+                    if (game.lives && !game.endgame) // se o jogo ainda não acabou
                     {
                         update_game(&game, key);
                         play_instant_samples(&audio, &game);
                     }
-                    else 
+                    else // jogo acabou
                     {
                         if (!game.lives)
                         {
+                            // se jogador perdeu, explode
                             end_game(&game);
                             game.n_plays.explosion = 1;
                             play_audio(audio.explosion, &(game.n_plays.explosion));
@@ -134,34 +135,39 @@ void state_play()
                         done = true;
                         state = ENDGAME;
                     }
+                    // seta todas as teclas como vistas
                     for(int i = 0; i < ALLEGRO_KEY_MAX; ++i)
                         key[i] &= KEY_SEEN;
                 }
-                else
+                else // há alguma entidade mudando de posição
                 {
-                    if(game.n_plays.step)
+                    // dois sons de passo são executados na transição de posição do player
+                    if (game.n_plays.step)
                         if (game.map.timer % (MAP_TIMER/game.n_plays.step) == 0)
                             play_sample(audio.step, 0.3);
+                    // decrementa timer de transição
                     game.map.timer--;
                 }
                 redraw = true;
                 break;
             
-            case ALLEGRO_EVENT_KEY_DOWN:
+            case ALLEGRO_EVENT_KEY_DOWN: // tecla foi pressionada
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
                 break;
             
-            case ALLEGRO_EVENT_KEY_UP:
+            case ALLEGRO_EVENT_KEY_UP: // tecla foi solta
                 key[event.keyboard.keycode] &= KEY_RELEASED;
                 break;
 
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+            case ALLEGRO_EVENT_DISPLAY_CLOSE: // display fechado
                 done = true;
                 break;
         }
-        if (key[ALLEGRO_KEY_ESCAPE])
+        if (key[ALLEGRO_KEY_ESCAPE] || !game.time) // jogador desistiu ou acabou o tempo
             game.lives = 0;
+
         else if (key[ALLEGRO_KEY_H] || key[ALLEGRO_KEY_F1])
+        // jogador abriu menu de instruções
         {
             key[ALLEGRO_KEY_H] = 0;
             key[ALLEGRO_KEY_F1] = 0;
@@ -184,6 +190,7 @@ void state_play()
 }
 
 void state_instructions()
+// estado do menu de instruções
 {
     state = PLAY;
 
@@ -191,6 +198,7 @@ void state_instructions()
     int done = 0;
     int draw = 1;
     
+    // limpa fila de eventos 
     al_flush_event_queue(queue);
     for (;;)
     {

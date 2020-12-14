@@ -132,7 +132,6 @@ void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
     sprites->hud = al_load_bitmap("resources/sprites/HUD.png");
     test_init(sprites->hud, "HUD");
 
-    init_background(sprites, map, disp);
 
     // carrega sprites de um estado das spritesheets
     sprites->wall = get_sprite(sprites->sheet[0], 84, 0, TILE_S, TILE_S);
@@ -147,6 +146,7 @@ void init_sprites(sprites_t *sprites, map_t *map, ALLEGRO_DISPLAY *disp)
     init_diamond_sprites(sprites);
     init_player_sprites(sprites);
     
+    init_background(sprites, map, disp);
 }
 
 void destroy_sprites(sprites_t *sprites)
