@@ -1,5 +1,0 @@
-get_audio
-comentarios
-draw_map
-hud
-jogador perde se acabar o tempo
